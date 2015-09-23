@@ -1,7 +1,8 @@
 
 /**
- *
- * @author Thiago Moura
+ * A clase Casa define as casas do ambiente e a peça que ela contém, caso não tem 
+ * nenhuma peça a casa tem valor null.
+ * 
  */
 public class Casa {
     private Peca peca;

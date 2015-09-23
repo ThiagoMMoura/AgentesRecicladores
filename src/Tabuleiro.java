@@ -2,8 +2,8 @@
 import java.util.ArrayList;
 
 /**
- *
- * @author Thiago Moura
+ * A classe Tabuleiro define o ambiente e a posição das casas.
+ * 
  */
 public class Tabuleiro {
     private Casa[][] casas;
@@ -31,6 +31,10 @@ public class Tabuleiro {
 
     public int getDimenssao() {
         return dimenssao;
+    }
+
+    public ArrayList<Lixeira> getLixeiras() {
+        return lixeiras;
     }
     
     private void inicializaCasas(){
@@ -65,30 +69,68 @@ public class Tabuleiro {
         Casa cs;
         int linha,coluna;
         for(int i=0;i<qtd;i++){
+            boolean b;
             do{
                 do{
-                    linha = (int) (Math.random() * dimenssao);
-                    coluna = (int) (Math.random() * dimenssao);
-                    cs = getCasa(linha, coluna);
-                }while(!cs.casaVazia());
+                    do{
+                        linha = (int) (Math.random() * dimenssao);
+                        coluna = (int) (Math.random() * dimenssao);
+                        cs = getCasa(linha, coluna);
+                    }while(!cs.casaVazia());
+                    //Bloco de IFs para impedir que as lixeiras se bloqueiem (Tentar reduzir código)
+                    if(esquerda(linha, coluna)!=null&&
+                            (esquerda(linha, coluna).getPeca()instanceof Lixeira)){
+                        b=true;
+                    }else if(direita(linha, coluna)!=null&&
+                            (direita(linha, coluna).getPeca()instanceof Lixeira)){
+                        b=true;
+                    }else if(baixo(linha, coluna)!=null&&
+                            (baixo(linha, coluna).getPeca()instanceof Lixeira)){
+                        b=true;
+                    }else if(cima(linha, coluna)!=null&&
+                            (cima(linha, coluna).getPeca()instanceof Lixeira)){
+                        b=true;
+                    }else b=false;
+                }while(b);
             }while(posicaoObstruida(linha, coluna));
             LixeiraSeco ls = new LixeiraSeco("LxS"+(i+1), capacidade);
             ls.setLinha(linha);
             ls.setColuna(coluna);
             cs.setPeca(ls);
+            this.lixeiras.add(ls);
             
             do{
                 do{
-                    linha = (int) (Math.random() * dimenssao);
-                    coluna = (int) (Math.random() * dimenssao);
-                    cs = getCasa(linha, coluna);
-                }while(!cs.casaVazia());
+                    do{
+                        linha = (int) (Math.random() * dimenssao);
+                        coluna = (int) (Math.random() * dimenssao);
+                        cs = getCasa(linha, coluna);
+                    }while(!cs.casaVazia());
+                    //Bloco de IFs para impedir que as lixeiras se bloqueiem (Tentar reduzir código)
+                    if(esquerda(linha, coluna)!=null&&
+                            (esquerda(linha, coluna).getPeca()instanceof Lixeira)){
+                        b=true;
+                    }else if(direita(linha, coluna)!=null&&
+                            (direita(linha, coluna).getPeca()instanceof Lixeira)){
+                        b=true;
+                    }else if(baixo(linha, coluna)!=null&&
+                            (baixo(linha, coluna).getPeca()instanceof Lixeira)){
+                        b=true;
+                    }else if(cima(linha, coluna)!=null&&
+                            (cima(linha, coluna).getPeca()instanceof Lixeira)){
+                        b=true;
+                    }else b=false;
+                }while(b);
             }while(posicaoObstruida(linha, coluna));
             LixeiraOrganico lo = new LixeiraOrganico("LxO"+(i+1), capacidade);
             lo.setLinha(linha);
             lo.setColuna(coluna);
             cs.setPeca(lo);
+            this.lixeiras.add(lo);
         }
+    }
+    public void posicionarAgentes(int qtd,int capacidadeSaco){
+        //Implementar posicionamento dos Agentes no Tabuleiro
     }
     
     //Método para buscar uma posição em uma das laterais de uma casa
@@ -99,11 +141,11 @@ public class Tabuleiro {
                     return this.casas[linha-distancia][coluna];
                 }
             }else if(direcao==SUL){
-                if(linha+distancia<=this.dimenssao){
+                if(linha+distancia<this.dimenssao){
                     return this.casas[linha+distancia][coluna];
                 }
             }else if(direcao==OESTE){
-                if(coluna+distancia<=this.dimenssao){
+                if(coluna+distancia<this.dimenssao){
                     return this.casas[linha][coluna+distancia];
                 }
             }else{
@@ -150,7 +192,7 @@ public class Tabuleiro {
     }
     
     public Casa baixo(int linha, int coluna){
-        return cima(linha,coluna,1);
+        return baixo(linha,coluna,1);
     }
     public Casa baixo(int linha, int coluna, int distancia){
         return posicaoRelativa(linha, coluna, distancia, SUL);
