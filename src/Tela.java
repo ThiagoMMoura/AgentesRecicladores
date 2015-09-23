@@ -1,6 +1,7 @@
 
 import java.awt.Color;
-import javax.swing.JLabel;
+import java.util.*;
+import javax.swing.*;
 import javax.swing.border.*;
 
 /**
@@ -10,6 +11,7 @@ import javax.swing.border.*;
 public class Tela extends javax.swing.JFrame {
     private JLabel[][] casas;
     private Tabuleiro tab;
+    private ArrayList<JMenuItem> itens;
     /**
      * Creates new form Tela
      */
@@ -32,29 +34,39 @@ public class Tela extends javax.swing.JFrame {
         painelPai = new javax.swing.JLayeredPane();
         painelFilhoIniciar = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        ctlDimensao = new javax.swing.JSpinner();
-        jLabel2 = new javax.swing.JLabel();
-        btnIniciar = new javax.swing.JButton();
+        btnPequeno = new javax.swing.JButton();
+        btnMedio = new javax.swing.JButton();
+        btnGrande = new javax.swing.JButton();
         painelFilhoTabuleiro = new javax.swing.JPanel();
-        jMenuBar1 = new javax.swing.JMenuBar();
+        barraMenus = new javax.swing.JMenuBar();
         menuPrincipal = new javax.swing.JMenu();
         itemInicio = new javax.swing.JMenuItem();
+        menuDebug = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText("Configure e Inicie");
+        jLabel1.setText("Selcione o tamanho do Ambiente:");
 
-        ctlDimensao.setModel(new javax.swing.SpinnerNumberModel(Integer.valueOf(6), Integer.valueOf(6), null, Integer.valueOf(1)));
-
-        jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        jLabel2.setText("Dimenssão do tabuleiro:");
-
-        btnIniciar.setText("Iniciar");
-        btnIniciar.addActionListener(new java.awt.event.ActionListener() {
+        btnPequeno.setText("Pequeno");
+        btnPequeno.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnIniciarActionPerformed(evt);
+                btnPequenoActionPerformed(evt);
+            }
+        });
+
+        btnMedio.setText("Médio");
+        btnMedio.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnMedioActionPerformed(evt);
+            }
+        });
+
+        btnGrande.setText("Grande");
+        btnGrande.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnGrandeActionPerformed(evt);
             }
         });
 
@@ -64,17 +76,14 @@ public class Tela extends javax.swing.JFrame {
             painelFilhoIniciarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelFilhoIniciarLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 377, Short.MAX_VALUE)
                 .addContainerGap())
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelFilhoIniciarLayout.createSequentialGroup()
-                .addGap(71, 71, 71)
-                .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 139, Short.MAX_VALUE)
-                .addGap(18, 18, 18)
-                .addComponent(ctlDimensao, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(84, 84, 84))
             .addGroup(painelFilhoIniciarLayout.createSequentialGroup()
-                .addGap(157, 157, 157)
-                .addComponent(btnIniciar)
+                .addGap(160, 160, 160)
+                .addGroup(painelFilhoIniciarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(btnPequeno, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnMedio, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnGrande, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         painelFilhoIniciarLayout.setVerticalGroup(
@@ -82,13 +91,13 @@ public class Tela extends javax.swing.JFrame {
             .addGroup(painelFilhoIniciarLayout.createSequentialGroup()
                 .addGap(37, 37, 37)
                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(47, 47, 47)
-                .addGroup(painelFilhoIniciarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(ctlDimensao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel2))
                 .addGap(18, 18, 18)
-                .addComponent(btnIniciar)
-                .addContainerGap(95, Short.MAX_VALUE))
+                .addComponent(btnPequeno)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(btnMedio)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(btnGrande)
+                .addContainerGap(94, Short.MAX_VALUE))
         );
 
         painelFilhoTabuleiro.setLayout(new java.awt.GridLayout(6, 6));
@@ -124,9 +133,12 @@ public class Tela extends javax.swing.JFrame {
         });
         menuPrincipal.add(itemInicio);
 
-        jMenuBar1.add(menuPrincipal);
+        barraMenus.add(menuPrincipal);
 
-        setJMenuBar(jMenuBar1);
+        menuDebug.setText("Debug");
+        barraMenus.add(menuDebug);
+
+        setJMenuBar(barraMenus);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -142,13 +154,21 @@ public class Tela extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnIniciarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIniciarActionPerformed
-        iniciarTabuleiro((int) ctlDimensao.getValue());
-    }//GEN-LAST:event_btnIniciarActionPerformed
+    private void btnPequenoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPequenoActionPerformed
+        iniciarTabuleiro(6,6,2,2);
+    }//GEN-LAST:event_btnPequenoActionPerformed
 
     private void itemInicioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemInicioActionPerformed
         visualizarPainel(this.painelFilhoIniciar.getName());
     }//GEN-LAST:event_itemInicioActionPerformed
+
+    private void btnMedioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMedioActionPerformed
+        iniciarTabuleiro(15,20,4,6);
+    }//GEN-LAST:event_btnMedioActionPerformed
+
+    private void btnGrandeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGrandeActionPerformed
+        iniciarTabuleiro(30,45,8,10);
+    }//GEN-LAST:event_btnGrandeActionPerformed
 
     /**
      * @param args the command line arguments
@@ -186,12 +206,13 @@ public class Tela extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnIniciar;
-    private javax.swing.JSpinner ctlDimensao;
+    private javax.swing.JMenuBar barraMenus;
+    private javax.swing.JButton btnGrande;
+    private javax.swing.JButton btnMedio;
+    private javax.swing.JButton btnPequeno;
     private javax.swing.JMenuItem itemInicio;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JMenu menuDebug;
     private javax.swing.JMenu menuPrincipal;
     private javax.swing.JPanel painelFilhoIniciar;
     private javax.swing.JPanel painelFilhoTabuleiro;
@@ -207,15 +228,19 @@ public class Tela extends javax.swing.JFrame {
         painelFilhoIniciar.setVisible(painelFilhoIniciar.getName().equalsIgnoreCase(nome));
         painelFilhoTabuleiro.setVisible(painelFilhoTabuleiro.getName().equalsIgnoreCase(nome));
     }
-    private void iniciarTabuleiro(int dimenssao){
+    private void iniciarTabuleiro(int dimenssao,int lixos,int lixeiras,int agentes){
         painelFilhoTabuleiro.removeAll();
         painelFilhoTabuleiro.setSize(dimenssao*50, dimenssao*50);
         painelFilhoTabuleiro.setLayout(new java.awt.GridLayout(dimenssao, dimenssao));
+        
         this.tab = new Tabuleiro(dimenssao);
         this.casas = new JLabel[dimenssao][dimenssao];
-        tab.posicionarLixos(dimenssao);
-        tab.posicionarLixeiras(2, dimenssao);
+        
+        tab.posicionarLixos(lixos);
+        tab.posicionarLixeiras(lixeiras, lixos/lixeiras);
+        
         atualizarTabuleiro();
+        
         visualizarPainel(painelFilhoTabuleiro.getName());
     }
     private void atualizarTabuleiro(){
@@ -235,5 +260,22 @@ public class Tela extends javax.swing.JFrame {
             }
         }
     }
-    
+    //Funções Debug para testes (Não implementado)
+    private void CriarItensMenuDebug(){
+        itens = new ArrayList<>();
+        Iterator it = tab.getLixeiras().iterator();
+        while(it.hasNext()){
+            Lixeira lx = (Lixeira) it.next();
+            itens.add(new JMenuItem(lx.getNome()));
+        }
+        
+    }
+    private void CriarMenuDebug(){
+        CriarItensMenuDebug();
+        Iterator it = itens.iterator();
+        menuDebug.removeAll();
+        while(it.hasNext()){
+            menuDebug.add((JMenuItem) it.next());
+        }
+    }
 }
