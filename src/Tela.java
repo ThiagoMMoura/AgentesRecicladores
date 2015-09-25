@@ -9,9 +9,10 @@ import javax.swing.border.*;
  * @author Thiago Moura
  */
 public class Tela extends javax.swing.JFrame {
-    private JLabel[][] casas;
-    private Tabuleiro tab;
+    private JLabel[][] quadrantes;
+    private Ambiente ambiente;
     private ArrayList<JMenuItem> itens;
+    private Agente ag1;
     /**
      * Creates new form Tela
      */
@@ -42,12 +43,15 @@ public class Tela extends javax.swing.JFrame {
         menuPrincipal = new javax.swing.JMenu();
         itemInicio = new javax.swing.JMenuItem();
         menuDebug = new javax.swing.JMenu();
+        itemCriarAgente = new javax.swing.JMenuItem();
+        itemPosicionarAgente = new javax.swing.JMenuItem();
+        itemMoverAgente = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText("Selcione o tamanho do Ambiente:");
+        jLabel1.setText("Selecione o tamanho do Ambiente:");
 
         btnPequeno.setText("Pequeno");
         btnPequeno.addActionListener(new java.awt.event.ActionListener() {
@@ -136,6 +140,31 @@ public class Tela extends javax.swing.JFrame {
         barraMenus.add(menuPrincipal);
 
         menuDebug.setText("Debug");
+
+        itemCriarAgente.setText("Criar Agente");
+        itemCriarAgente.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                itemCriarAgenteActionPerformed(evt);
+            }
+        });
+        menuDebug.add(itemCriarAgente);
+
+        itemPosicionarAgente.setText("Posicionar Agente");
+        itemPosicionarAgente.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                itemPosicionarAgenteActionPerformed(evt);
+            }
+        });
+        menuDebug.add(itemPosicionarAgente);
+
+        itemMoverAgente.setText("Mover Agente");
+        itemMoverAgente.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                itemMoverAgenteActionPerformed(evt);
+            }
+        });
+        menuDebug.add(itemMoverAgente);
+
         barraMenus.add(menuDebug);
 
         setJMenuBar(barraMenus);
@@ -155,7 +184,7 @@ public class Tela extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnPequenoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPequenoActionPerformed
-        iniciarTabuleiro(6,6,2,2);
+        iniciarAmbiente(6,6,2,2);
     }//GEN-LAST:event_btnPequenoActionPerformed
 
     private void itemInicioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemInicioActionPerformed
@@ -163,12 +192,50 @@ public class Tela extends javax.swing.JFrame {
     }//GEN-LAST:event_itemInicioActionPerformed
 
     private void btnMedioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMedioActionPerformed
-        iniciarTabuleiro(15,20,4,6);
+        iniciarAmbiente(15,20,4,6);
     }//GEN-LAST:event_btnMedioActionPerformed
 
     private void btnGrandeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGrandeActionPerformed
-        iniciarTabuleiro(30,45,8,10);
+        iniciarAmbiente(30,45,8,10);
     }//GEN-LAST:event_btnGrandeActionPerformed
+
+    private void itemCriarAgenteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemCriarAgenteActionPerformed
+        ArrayList<MemoriaLixeira> ml = new ArrayList<>();
+        Iterator it = ambiente.getLixeiras().iterator();
+        while(it.hasNext()) ml.add(new MemoriaLixeira((Lixeira) it.next()));
+        ag1 = new Agente("AG1", 2, ml, ambiente);
+        itemCriarAgente.setEnabled(false);
+        itemPosicionarAgente.setEnabled(true);
+        System.out.println("Agente criado.");
+    }//GEN-LAST:event_itemCriarAgenteActionPerformed
+
+    private void itemPosicionarAgenteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemPosicionarAgenteActionPerformed
+        String res;
+        res = JOptionPane.showInputDialog("Digite a linha:");
+        if(res!=null){
+            int linha = Integer.parseInt(res);
+            res = JOptionPane.showInputDialog("Digite a coluna:");
+            if(res!=null){
+                int coluna = Integer.parseInt(res);
+                if(ambiente.getQuadrante(linha-1, coluna-1).setPeca(ag1)){
+                    ag1.setLinha(linha-1);
+                    ag1.setColuna(coluna-1);
+                    itemPosicionarAgente.setEnabled(false);
+                    itemMoverAgente.setEnabled(true);
+                    atualizarAmbiente();
+                }else System.out.println("Posição ocupada.");
+            }
+        }
+    }//GEN-LAST:event_itemPosicionarAgenteActionPerformed
+
+    private void itemMoverAgenteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemMoverAgenteActionPerformed
+        int direcao = JOptionPane.showOptionDialog(this, "Escolha a direção:", "Mover Agente", JOptionPane.OK_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[]{"esquerda","direita","cima","baixo"}, 0);
+        if(direcao!=JOptionPane.CLOSED_OPTION){
+            System.out.println("Direcao: "+direcao);
+            if(ag1.andar(direcao)) atualizarAmbiente();
+            else System.out.println("Quadrante ocupado.");
+        }else System.out.println("Agente não se moveu.");
+    }//GEN-LAST:event_itemMoverAgenteActionPerformed
 
     /**
      * @param args the command line arguments
@@ -210,7 +277,10 @@ public class Tela extends javax.swing.JFrame {
     private javax.swing.JButton btnGrande;
     private javax.swing.JButton btnMedio;
     private javax.swing.JButton btnPequeno;
+    private javax.swing.JMenuItem itemCriarAgente;
     private javax.swing.JMenuItem itemInicio;
+    private javax.swing.JMenuItem itemMoverAgente;
+    private javax.swing.JMenuItem itemPosicionarAgente;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JMenu menuDebug;
     private javax.swing.JMenu menuPrincipal;
@@ -227,43 +297,58 @@ public class Tela extends javax.swing.JFrame {
     private void visualizarPainel(String nome){
         painelFilhoIniciar.setVisible(painelFilhoIniciar.getName().equalsIgnoreCase(nome));
         painelFilhoTabuleiro.setVisible(painelFilhoTabuleiro.getName().equalsIgnoreCase(nome));
+        itemCriarAgente.setEnabled(painelFilhoTabuleiro.getName().equalsIgnoreCase(nome));
+        if(!itemCriarAgente.isEnabled())itemPosicionarAgente.setEnabled(false);
+        if(!itemCriarAgente.isEnabled())itemMoverAgente.setEnabled(false);
     }
-    private void iniciarTabuleiro(int dimenssao,int lixos,int lixeiras,int agentes){
+    private void iniciarAmbiente(int dimenssao,int lixos,int lixeiras,int agentes){
         painelFilhoTabuleiro.removeAll();
         painelFilhoTabuleiro.setSize(dimenssao*50, dimenssao*50);
         painelFilhoTabuleiro.setLayout(new java.awt.GridLayout(dimenssao, dimenssao));
         
-        this.tab = new Tabuleiro(dimenssao);
-        this.casas = new JLabel[dimenssao][dimenssao];
+        this.ambiente = new Ambiente(dimenssao);
+        this.quadrantes = new JLabel[dimenssao][dimenssao];
         
-        tab.posicionarLixos(lixos);
-        tab.posicionarLixeiras(lixeiras, lixos/lixeiras);
+        ambiente.posicionarLixos(lixos);
+        ambiente.posicionarLixeiras(lixeiras, lixos/lixeiras);
+        ambiente.posicionarAgentes(agentes, dimenssao/2);
         
-        atualizarTabuleiro();
+        criarAmbiente();
         
         visualizarPainel(painelFilhoTabuleiro.getName());
     }
-    private void atualizarTabuleiro(){
-        int d = tab.getDimenssao();
+    private void criarAmbiente(){
+        int d = ambiente.getDimenssao();
         for(int l=0;l<d;l++){
             for(int c=0;c<d;c++){
-                JLabel jl = new JLabel();Border eb = new LineBorder(Color.BLACK);
+                JLabel jl = new JLabel();
+                Border eb = new LineBorder(Color.BLACK);
                 jl.setBorder(eb);
                 jl.setHorizontalAlignment(JLabel.CENTER);
                 
-                Casa cs = tab.getCasa(l, c);
-                if(cs.casaVazia())jl.setText("");
-                else jl.setText(cs.getPeca().getNome());
+                Quadrante qd = ambiente.getQuadrante(l, c);
+                if(qd.estaVazio())jl.setText("");
+                else jl.setText(qd.getPeca().getNome());
                 
-                casas[l][c] = jl;
-                painelFilhoTabuleiro.add(casas[l][c]);
+                quadrantes[l][c] = jl;
+                painelFilhoTabuleiro.add(quadrantes[l][c]);
+            }
+        }
+    }
+    public void atualizarAmbiente(){
+        int d = ambiente.getDimenssao();
+        for(int l=0;l<d;l++){
+            for(int c=0;c<d;c++){
+                Quadrante qd = ambiente.getQuadrante(l, c);
+                if(qd.estaVazio())quadrantes[l][c].setText("");
+                else quadrantes[l][c].setText(qd.getPeca().getNome());
             }
         }
     }
     //Funções Debug para testes (Não implementado)
     private void CriarItensMenuDebug(){
         itens = new ArrayList<>();
-        Iterator it = tab.getLixeiras().iterator();
+        Iterator it = ambiente.getLixeiras().iterator();
         while(it.hasNext()){
             Lixeira lx = (Lixeira) it.next();
             itens.add(new JMenuItem(lx.getNome()));
