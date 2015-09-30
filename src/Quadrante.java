@@ -38,9 +38,8 @@ public class Quadrante {
     }
     
     public Lixo recolherLixo(){
-        Lixo lx = getLixo();
-        limpar();
-        return lx;
+        if(getLixo()!=null) return (Lixo) remover();
+        return null;
     }
     /**
      *
@@ -71,6 +70,7 @@ public class Quadrante {
      * @return <code>true</code> - Se tiver um Lixo nesse quadrante.
      */
     public boolean temLixo(){
+        if(estaVazio())return false;
         return this.peca instanceof Lixo;
     }
     
@@ -79,6 +79,7 @@ public class Quadrante {
      * @return <code>true</code> - Se tiver uma Lixera nesse quadrante.
      */
     public boolean temLixeira(){
+        if(estaVazio())return false;
         return this.peca instanceof Lixeira;
     }
     
@@ -99,8 +100,10 @@ public class Quadrante {
         return coluna;
     }
     
-    public void limpar(){
+    public Peca remover(){
+        Peca oldPeca = this.peca;
         this.peca = null;
+        return oldPeca;
     }
     
 }

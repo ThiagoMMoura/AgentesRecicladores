@@ -1,5 +1,6 @@
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * A classe Ambiente define o ambiente e a posição dos quadrantes.
@@ -9,6 +10,7 @@ public class Ambiente {
     private final Quadrante[][] quadrantes;
     private final int dimenssao;
     private final ArrayList<Lixeira> lixeiras;
+    private final ArrayList<Agente> agentes;
     public static final int LESTE = 0;
     public static final int OESTE = 1;
     public static final int NORTE = 2;
@@ -18,6 +20,7 @@ public class Ambiente {
         this.dimenssao = dimenssao;
         this.quadrantes = new Quadrante[dimenssao][dimenssao];
         this.lixeiras = new ArrayList<>();
+        this.agentes = new ArrayList<>();
         inicializaCasas();
     }
 
@@ -26,11 +29,15 @@ public class Ambiente {
     }
     
     public Quadrante getQuadrante(int linha, int coluna){
-        return quadrantes[linha][coluna];
+        if(linha>=this.dimenssao||linha<0||coluna>=this.dimenssao||coluna<0){
+            return null;
+        }else return quadrantes[linha][coluna];
     }
 
-    public boolean quadranteVazio(int linha, int coluna){
-        return quadrantes[linha][coluna].estaVazio();
+    public boolean quadranteVazio(int linha, int coluna) throws QuadranteNotExistException{
+        if(linha>=this.dimenssao||linha<0||coluna>=this.dimenssao||coluna<0){
+            throw new QuadranteNotExistException();
+        }else return quadrantes[linha][coluna].estaVazio();
     }
     public int getDimenssao() {
         return dimenssao;
@@ -38,6 +45,10 @@ public class Ambiente {
 
     public ArrayList<Lixeira> getLixeiras() {
         return lixeiras;
+    }
+
+    public ArrayList<Agente> getAgentes() {
+        return agentes;
     }
     
     private void inicializaCasas(){
@@ -132,8 +143,46 @@ public class Ambiente {
             this.lixeiras.add(lo);
         }
     }
-    public void posicionarAgentes(int qtd,int capacidadeSaco){
+    public void posicionarAgentes(int qtd,int maxLixo,ArrayList<Lixeira> lxs,Ambiente ambiente){
         //Implementar posicionamento dos Agentes no Ambiente
+        Quadrante qd;
+        int linha,coluna;
+        for(int i=0;i<qtd;i++){
+            boolean b;
+            do{
+                do{
+                    do{
+                        linha = (int) (Math.random() * dimenssao);
+                        coluna = (int) (Math.random() * dimenssao);
+                        qd = getQuadrante(linha, coluna);
+                    }while(!qd.estaVazio());
+                    //Bloco de IFs para impedir que os Agentes se bloqueiem (Tentar reduzir código)
+                    if(esquerda(linha, coluna)!=null&&
+                            (esquerda(linha, coluna).getPeca()instanceof Agente)){
+                        b=true;
+                    }else if(direita(linha, coluna)!=null&&
+                            (direita(linha, coluna).getPeca()instanceof Agente)){
+                        b=true;
+                    }else if(baixo(linha, coluna)!=null&&
+                            (baixo(linha, coluna).getPeca()instanceof Agente)){
+                        b=true;
+                    }else if(cima(linha, coluna)!=null&&
+                            (cima(linha, coluna).getPeca()instanceof Agente)){
+                        b=true;
+                    }else b=false;
+                }while(b);
+            }while(posicaoObstruida(linha, coluna));
+            
+            ArrayList<MemoriaLixeira> ml = new ArrayList<>();
+            Iterator it = lxs.iterator();
+            while(it.hasNext()) ml.add(new MemoriaLixeira((Lixeira) it.next()));
+            
+            Agente ag = new Agente("AG"+(i+1), maxLixo,ml,ambiente);
+            ag.setLinha(linha);
+            ag.setColuna(coluna);
+            qd.setPeca(ag);
+            this.agentes.add(ag);
+        }
     }
 
     /**

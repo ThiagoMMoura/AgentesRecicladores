@@ -11,7 +11,7 @@ public class Lixeira extends Peca{
     private ArrayList<Lixo> lixos;
 
     public Lixeira(String nome, int capacidade) {
-        super(nome+"["+capacidade+"]");
+        super(nome);
         this.lixos = new ArrayList<>();
         this.capacidade = capacidade;
     }
@@ -26,11 +26,15 @@ public class Lixeira extends Peca{
     
     public boolean addLixo(Lixo lx){
         if(lixos.size()<capacidade){
-            lixos.add(lx);
-            super.setNome(super.getNome().split("[")[0]+"["+(capacidade-getQtdLixos())+"]");
-            return true;
+            System.out.println("Recebido lixo: "+lx.getNome());
+            return lixos.add(lx);
         }
         return false;
+    }
+    
+    @Override
+    public String getNome(){
+        return super.getNome()+"["+(capacidade-getQtdLixos())+"]";
     }
 
 }

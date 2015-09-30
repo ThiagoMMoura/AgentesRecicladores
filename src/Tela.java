@@ -1,5 +1,6 @@
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.border.*;
@@ -8,15 +9,14 @@ import javax.swing.border.*;
  *
  * @author Thiago Moura
  */
-public class Tela extends javax.swing.JFrame {
+public class Tela extends javax.swing.JFrame implements MundoAgente{
     private JLabel[][] quadrantes;
-    private Ambiente ambiente;
     private ArrayList<JMenuItem> itens;
-    private Agente ag1;
+    private Deus deus;
     /**
      * Creates new form Tela
      */
-    public Tela() {
+    public Tela(){
         initComponents();
         inicializar();
         visualizarPainel(painelFilhoIniciar.getName());
@@ -32,22 +32,57 @@ public class Tela extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        painelPai = new javax.swing.JLayeredPane();
+        painelPai = new javax.swing.JPanel();
+        painelCamadas = new javax.swing.JLayeredPane();
+        painelFilhoTabuleiro = new javax.swing.JPanel();
+        scrollAmbiente = new javax.swing.JScrollPane();
+        painelScrollAmbiente = new javax.swing.JPanel();
+        painelAmbiente = new javax.swing.JPanel();
         painelFilhoIniciar = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         btnPequeno = new javax.swing.JButton();
         btnMedio = new javax.swing.JButton();
         btnGrande = new javax.swing.JButton();
-        painelFilhoTabuleiro = new javax.swing.JPanel();
         barraMenus = new javax.swing.JMenuBar();
         menuPrincipal = new javax.swing.JMenu();
         itemInicio = new javax.swing.JMenuItem();
-        menuDebug = new javax.swing.JMenu();
-        itemCriarAgente = new javax.swing.JMenuItem();
-        itemPosicionarAgente = new javax.swing.JMenuItem();
-        itemMoverAgente = new javax.swing.JMenuItem();
+        menuCiclo = new javax.swing.JMenu();
+        btnIniciarCiclo = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Agentes Recicladores");
+
+        painelCamadas.setAutoscrolls(true);
+
+        painelAmbiente.setLayout(new java.awt.GridLayout());
+
+        javax.swing.GroupLayout painelScrollAmbienteLayout = new javax.swing.GroupLayout(painelScrollAmbiente);
+        painelScrollAmbiente.setLayout(painelScrollAmbienteLayout);
+        painelScrollAmbienteLayout.setHorizontalGroup(
+            painelScrollAmbienteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(painelScrollAmbienteLayout.createSequentialGroup()
+                .addComponent(painelAmbiente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 395, Short.MAX_VALUE))
+        );
+        painelScrollAmbienteLayout.setVerticalGroup(
+            painelScrollAmbienteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(painelScrollAmbienteLayout.createSequentialGroup()
+                .addComponent(painelAmbiente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 281, Short.MAX_VALUE))
+        );
+
+        scrollAmbiente.setViewportView(painelScrollAmbiente);
+
+        javax.swing.GroupLayout painelFilhoTabuleiroLayout = new javax.swing.GroupLayout(painelFilhoTabuleiro);
+        painelFilhoTabuleiro.setLayout(painelFilhoTabuleiroLayout);
+        painelFilhoTabuleiroLayout.setHorizontalGroup(
+            painelFilhoTabuleiroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(scrollAmbiente)
+        );
+        painelFilhoTabuleiroLayout.setVerticalGroup(
+            painelFilhoTabuleiroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(scrollAmbiente)
+        );
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -101,31 +136,44 @@ public class Tela extends javax.swing.JFrame {
                 .addComponent(btnMedio)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btnGrande)
-                .addContainerGap(94, Short.MAX_VALUE))
+                .addContainerGap(95, Short.MAX_VALUE))
         );
 
-        painelFilhoTabuleiro.setLayout(new java.awt.GridLayout(6, 6));
+        javax.swing.GroupLayout painelCamadasLayout = new javax.swing.GroupLayout(painelCamadas);
+        painelCamadas.setLayout(painelCamadasLayout);
+        painelCamadasLayout.setHorizontalGroup(
+            painelCamadasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(painelFilhoIniciar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(painelCamadasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addComponent(painelFilhoTabuleiro, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        painelCamadasLayout.setVerticalGroup(
+            painelCamadasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(painelFilhoIniciar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(painelCamadasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addComponent(painelFilhoTabuleiro, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        painelCamadas.setLayer(painelFilhoTabuleiro, javax.swing.JLayeredPane.DEFAULT_LAYER);
+
+        painelFilhoTabuleiro.getAccessibleContext().setAccessibleName("Tabuleiro");
+        painelFilhoTabuleiro.getAccessibleContext().setAccessibleDescription("");
+        painelCamadas.setLayer(painelFilhoIniciar, javax.swing.JLayeredPane.DEFAULT_LAYER);
+        painelFilhoIniciar.getAccessibleContext().setAccessibleName("Iniciar");
 
         javax.swing.GroupLayout painelPaiLayout = new javax.swing.GroupLayout(painelPai);
         painelPai.setLayout(painelPaiLayout);
         painelPaiLayout.setHorizontalGroup(
             painelPaiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(painelFilhoIniciar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGap(0, 397, Short.MAX_VALUE)
             .addGroup(painelPaiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addComponent(painelFilhoTabuleiro, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(painelCamadas))
         );
         painelPaiLayout.setVerticalGroup(
             painelPaiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(painelFilhoIniciar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGap(0, 283, Short.MAX_VALUE)
             .addGroup(painelPaiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addComponent(painelFilhoTabuleiro, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(painelCamadas))
         );
-        painelPai.setLayer(painelFilhoIniciar, javax.swing.JLayeredPane.DEFAULT_LAYER);
-
-        painelFilhoIniciar.getAccessibleContext().setAccessibleName("Iniciar");
-        painelPai.setLayer(painelFilhoTabuleiro, javax.swing.JLayeredPane.DEFAULT_LAYER);
-        painelFilhoTabuleiro.getAccessibleContext().setAccessibleName("Tabuleiro");
-        painelFilhoTabuleiro.getAccessibleContext().setAccessibleDescription("");
 
         menuPrincipal.setText("Menu");
 
@@ -139,33 +187,17 @@ public class Tela extends javax.swing.JFrame {
 
         barraMenus.add(menuPrincipal);
 
-        menuDebug.setText("Debug");
+        menuCiclo.setText("Ciclo");
 
-        itemCriarAgente.setText("Criar Agente");
-        itemCriarAgente.addActionListener(new java.awt.event.ActionListener() {
+        btnIniciarCiclo.setText("Iniciar");
+        btnIniciarCiclo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                itemCriarAgenteActionPerformed(evt);
+                btnIniciarCicloActionPerformed(evt);
             }
         });
-        menuDebug.add(itemCriarAgente);
+        menuCiclo.add(btnIniciarCiclo);
 
-        itemPosicionarAgente.setText("Posicionar Agente");
-        itemPosicionarAgente.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                itemPosicionarAgenteActionPerformed(evt);
-            }
-        });
-        menuDebug.add(itemPosicionarAgente);
-
-        itemMoverAgente.setText("Mover Agente");
-        itemMoverAgente.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                itemMoverAgenteActionPerformed(evt);
-            }
-        });
-        menuDebug.add(itemMoverAgente);
-
-        barraMenus.add(menuDebug);
+        barraMenus.add(menuCiclo);
 
         setJMenuBar(barraMenus);
 
@@ -173,11 +205,11 @@ public class Tela extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(painelPai)
+            .addComponent(painelPai, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(painelPai)
+            .addComponent(painelPai, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();
@@ -199,43 +231,10 @@ public class Tela extends javax.swing.JFrame {
         iniciarAmbiente(30,45,8,10);
     }//GEN-LAST:event_btnGrandeActionPerformed
 
-    private void itemCriarAgenteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemCriarAgenteActionPerformed
-        ArrayList<MemoriaLixeira> ml = new ArrayList<>();
-        Iterator it = ambiente.getLixeiras().iterator();
-        while(it.hasNext()) ml.add(new MemoriaLixeira((Lixeira) it.next()));
-        ag1 = new Agente("AG1", 2, ml, ambiente);
-        itemCriarAgente.setEnabled(false);
-        itemPosicionarAgente.setEnabled(true);
-        System.out.println("Agente criado.");
-    }//GEN-LAST:event_itemCriarAgenteActionPerformed
-
-    private void itemPosicionarAgenteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemPosicionarAgenteActionPerformed
-        String res;
-        res = JOptionPane.showInputDialog("Digite a linha:");
-        if(res!=null){
-            int linha = Integer.parseInt(res);
-            res = JOptionPane.showInputDialog("Digite a coluna:");
-            if(res!=null){
-                int coluna = Integer.parseInt(res);
-                if(ambiente.getQuadrante(linha-1, coluna-1).setPeca(ag1)){
-                    ag1.setLinha(linha-1);
-                    ag1.setColuna(coluna-1);
-                    itemPosicionarAgente.setEnabled(false);
-                    itemMoverAgente.setEnabled(true);
-                    atualizarAmbiente();
-                }else System.out.println("Posição ocupada.");
-            }
-        }
-    }//GEN-LAST:event_itemPosicionarAgenteActionPerformed
-
-    private void itemMoverAgenteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemMoverAgenteActionPerformed
-        int direcao = JOptionPane.showOptionDialog(this, "Escolha a direção:", "Mover Agente", JOptionPane.OK_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[]{"esquerda","direita","cima","baixo"}, 0);
-        if(direcao!=JOptionPane.CLOSED_OPTION){
-            System.out.println("Direcao: "+direcao);
-            if(ag1.andar(direcao)) atualizarAmbiente();
-            else System.out.println("Quadrante ocupado.");
-        }else System.out.println("Agente não se moveu.");
-    }//GEN-LAST:event_itemMoverAgenteActionPerformed
+    private void btnIniciarCicloActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIniciarCicloActionPerformed
+        System.out.println("Iniciando Ciclo...");
+        deus.iniciarCiclo();
+    }//GEN-LAST:event_btnIniciarCicloActionPerformed
 
     /**
      * @param args the command line arguments
@@ -275,18 +274,20 @@ public class Tela extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuBar barraMenus;
     private javax.swing.JButton btnGrande;
+    private javax.swing.JMenuItem btnIniciarCiclo;
     private javax.swing.JButton btnMedio;
     private javax.swing.JButton btnPequeno;
-    private javax.swing.JMenuItem itemCriarAgente;
     private javax.swing.JMenuItem itemInicio;
-    private javax.swing.JMenuItem itemMoverAgente;
-    private javax.swing.JMenuItem itemPosicionarAgente;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JMenu menuDebug;
+    private javax.swing.JMenu menuCiclo;
     private javax.swing.JMenu menuPrincipal;
+    private javax.swing.JPanel painelAmbiente;
+    private javax.swing.JLayeredPane painelCamadas;
     private javax.swing.JPanel painelFilhoIniciar;
     private javax.swing.JPanel painelFilhoTabuleiro;
-    private javax.swing.JLayeredPane painelPai;
+    private javax.swing.JPanel painelPai;
+    private javax.swing.JPanel painelScrollAmbiente;
+    private javax.swing.JScrollPane scrollAmbiente;
     // End of variables declaration//GEN-END:variables
 
     private void inicializar(){
@@ -297,28 +298,38 @@ public class Tela extends javax.swing.JFrame {
     private void visualizarPainel(String nome){
         painelFilhoIniciar.setVisible(painelFilhoIniciar.getName().equalsIgnoreCase(nome));
         painelFilhoTabuleiro.setVisible(painelFilhoTabuleiro.getName().equalsIgnoreCase(nome));
-        itemCriarAgente.setEnabled(painelFilhoTabuleiro.getName().equalsIgnoreCase(nome));
-        if(!itemCriarAgente.isEnabled())itemPosicionarAgente.setEnabled(false);
-        if(!itemCriarAgente.isEnabled())itemMoverAgente.setEnabled(false);
+        menuCiclo.setEnabled(painelFilhoTabuleiro.getName().equalsIgnoreCase(nome));
     }
     private void iniciarAmbiente(int dimenssao,int lixos,int lixeiras,int agentes){
-        painelFilhoTabuleiro.removeAll();
-        painelFilhoTabuleiro.setSize(dimenssao*50, dimenssao*50);
-        painelFilhoTabuleiro.setLayout(new java.awt.GridLayout(dimenssao, dimenssao));
+        criarAmbiente(dimenssao);
         
-        this.ambiente = new Ambiente(dimenssao);
-        this.quadrantes = new JLabel[dimenssao][dimenssao];
+        this.deus = new Deus(this,dimenssao,lixos,lixeiras,agentes);
         
-        ambiente.posicionarLixos(lixos);
-        ambiente.posicionarLixeiras(lixeiras, lixos/lixeiras);
-        ambiente.posicionarAgentes(agentes, dimenssao/2);
+        //ambiente.posicionarLixos(lixos);
+        //ambiente.posicionarLixeiras(lixeiras, lixos/lixeiras);
+        //ambiente.posicionarAgentes(agentes, dimenssao/2,ambiente.getLixeiras(),ambiente);
         
-        criarAmbiente();
+        deus.iniciarAmbiente();
         
         visualizarPainel(painelFilhoTabuleiro.getName());
     }
-    private void criarAmbiente(){
-        int d = ambiente.getDimenssao();
+    private void criarAmbiente(int dimenssao){
+        Dimension d = new Dimension(dimenssao*60, dimenssao*60);
+        painelAmbiente.removeAll();
+        
+        painelAmbiente.setLayout(new java.awt.GridLayout(dimenssao, dimenssao));
+        
+        painelAmbiente.setPreferredSize(d);
+        painelAmbiente.setMinimumSize(d);
+        painelAmbiente.setMaximumSize(d);
+        
+        painelScrollAmbiente.setPreferredSize(d);
+        
+        criarQuadrantes(dimenssao);
+    }
+    private void criarQuadrantes(int dimenssao){
+        this.quadrantes = new JLabel[dimenssao][dimenssao];
+        int d = dimenssao;
         for(int l=0;l<d;l++){
             for(int c=0;c<d;c++){
                 JLabel jl = new JLabel();
@@ -326,16 +337,16 @@ public class Tela extends javax.swing.JFrame {
                 jl.setBorder(eb);
                 jl.setHorizontalAlignment(JLabel.CENTER);
                 
-                Quadrante qd = ambiente.getQuadrante(l, c);
-                if(qd.estaVazio())jl.setText("");
-                else jl.setText(qd.getPeca().getNome());
+                jl.setText("");
                 
                 quadrantes[l][c] = jl;
-                painelFilhoTabuleiro.add(quadrantes[l][c]);
+                painelAmbiente.add(quadrantes[l][c]);
             }
         }
     }
-    public void atualizarAmbiente(){
+    
+    @Override
+    public void atualizaCiclo(Ambiente ambiente){
         int d = ambiente.getDimenssao();
         for(int l=0;l<d;l++){
             for(int c=0;c<d;c++){
@@ -344,23 +355,14 @@ public class Tela extends javax.swing.JFrame {
                 else quadrantes[l][c].setText(qd.getPeca().getNome());
             }
         }
-    }
-    //Funções Debug para testes (Não implementado)
-    private void CriarItensMenuDebug(){
-        itens = new ArrayList<>();
-        Iterator it = ambiente.getLixeiras().iterator();
-        while(it.hasNext()){
-            Lixeira lx = (Lixeira) it.next();
-            itens.add(new JMenuItem(lx.getNome()));
+        System.out.println("-------INICIO CICLO--------");
+        for(Lixeira lx:deus.getLixeiras()){
+            System.out.println(lx.getNome()+" - Posição: "+lx.getLinha()+"x"+lx.getColuna()+" - Ocupado: "+lx.getQtdLixos()+"/"+lx.getCapacidade());
         }
-        
-    }
-    private void CriarMenuDebug(){
-        CriarItensMenuDebug();
-        Iterator it = itens.iterator();
-        menuDebug.removeAll();
-        while(it.hasNext()){
-            menuDebug.add((JMenuItem) it.next());
+        for(Agente ag:deus.getAgentes()){
+            System.out.println(ag.getNome()+" - Posição: "+ag.getLinha()+"x"+ag.getColuna()+" - Lixo orgânico: "+ag.getQtdLixoOrganico()+"/"+ag.getMaxLixo()+" - Lixo Seco: "+ag.getQtdLixoSeco()+"/"+ag.getMaxLixo());
         }
+        System.out.println("-------FIM CICLO--------");
     }
+
 }
