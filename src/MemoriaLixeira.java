@@ -17,6 +17,13 @@ public class MemoriaLixeira extends Lixeira{
         return super.getCapacidade()==this.qtdLixos;
     }
     
+    public boolean isOrganico(){
+        return lixeira instanceof LixeiraOrganico;
+    }
+    
+    public boolean isSeco(){
+        return lixeira instanceof LixeiraSeco;
+    }
     public void Visitada(){
         this.qtdLixos = super.getQtdLixos();
     }

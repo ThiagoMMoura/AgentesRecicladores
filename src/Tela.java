@@ -314,7 +314,7 @@ public class Tela extends javax.swing.JFrame implements MundoAgente{
         visualizarPainel(painelFilhoTabuleiro.getName());
     }
     private void criarAmbiente(int dimenssao){
-        Dimension d = new Dimension(dimenssao*60, dimenssao*60);
+        Dimension d = new Dimension(dimenssao*50, dimenssao*50);
         painelAmbiente.removeAll();
         
         painelAmbiente.setLayout(new java.awt.GridLayout(dimenssao, dimenssao));

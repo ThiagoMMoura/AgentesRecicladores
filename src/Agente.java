@@ -56,7 +56,17 @@ public class Agente extends Peca{
         }return false;
     }
     
-    public boolean andar(int direcao){
+    /**
+     *
+     * @param direcao Direcao em que o agente vai andar. Pode ser uma das quatro
+     * direções definidas na classe <code>{@link Ambiente}</code>:
+     * <code>LESTE</code>, <code>OESTE</code>, <code>NORTE</code> e <code>SUL</code>.
+     * 
+     * @return <code>true</code> - Se o agente se moveu ou depositou lixo.
+     * 
+     * @see Ambiente
+     */
+    private boolean andar(int direcao,boolean despejarLixo){
         Quadrante quadrante = ambiente.quadranteAdjacente(getLinha(), getColuna(), 1, direcao);
         if(quadrante!=null&&quadrante.estaVazio()){
             quadrante.setPeca(ambiente.getQuadrante(getLinha(), getColuna()).remover());
@@ -66,12 +76,12 @@ public class Agente extends Peca{
         }else if(quadrante!=null&&quadrante.temLixo()){
             if(guardarLixo(quadrante.getLixo())){
                 quadrante.remover();
-                return andar(direcao);
+                return andar(direcao,despejarLixo);
             }else {
                 System.out.println("Não foi possivel coletar lixo.");
                 return false;
             }
-        }else if(quadrante!=null&&quadrante.temLixeira()){
+        }else if(despejarLixo&&quadrante!=null&&quadrante.temLixeira()){
             Lixeira lx = (Lixeira) quadrante.getPeca();
             despejarLixo(lx);
             visitarLixeira(lx);
@@ -95,13 +105,145 @@ public class Agente extends Peca{
             if(lxs.equals(lx))lxs.Visitada();
         }
     }
-    public void perceberAmbiente(){
-        
+    private Quadrante[][] perceberAmbiente(){
+        Quadrante[][] qdm = new Quadrante[4][2];
+        for(int d=0;d<4;d++){
+            for(int q=0;q<2;q++){
+                qdm[d][q]= this.ambiente.quadranteAdjacente(this.getLinha(), this.getColuna(), q+1, d);
+            }
+        }
+        return qdm;
+    }
+
+    private int direcaoLixo(){
+        Quadrante[][] qdm = perceberAmbiente();
+        boolean usar = false;
+        for(int q=0;q<2;q++){
+            for(int d=0;d<4;d++){
+                if(q==0){
+                    if(qdm[d][q]!=null&&qdm[d][q].temLixo())return d;
+                }else{
+                    if(qdm[d][q]!=null&&qdm[d][q-1].estaVazio()&&qdm[d][q].temLixo()) return d;
+                    if(usar&&qdm[d][q]!=null&&qdm[d][q].temLixo()){
+                        if(d==Ambiente.LESTE||d==Ambiente.OESTE){
+                            if(qdm[Ambiente.NORTE][0]!=null&&qdm[Ambiente.NORTE][0].estaVazio())return Ambiente.NORTE;
+                            if(qdm[Ambiente.SUL][0]!=null&&qdm[Ambiente.SUL][0].estaVazio())return Ambiente.SUL;
+                        }else{
+                            if(qdm[Ambiente.LESTE][0]!=null&&qdm[Ambiente.LESTE][0].estaVazio())return Ambiente.LESTE;
+                            if(qdm[Ambiente.OESTE][0]!=null&&qdm[Ambiente.OESTE][0].estaVazio())return Ambiente.OESTE;
+                        }
+                    }
+                }
+            }
+            if(usar)break;
+            if(q==1){
+                usar=true;
+                q--;
+            }
+        }
+        return -1;
     }
     
+    private int direcaoLixeiraOrganica(){
+        MemoriaLixeira maisProxima = null;
+        for(MemoriaLixeira lixeira : lixeiras){
+            if(lixeira.isOrganico()){
+                if(!lixeira.isCheia()){
+                    if(maisProxima==null)maisProxima=lixeira;
+                    else{
+                        int distanciaAnt = Math.abs((maisProxima.getLinha()+maisProxima.getColuna())-(this.getLinha()+this.getColuna()));
+                        int distanciaPro = Math.abs((lixeira.getLinha()+lixeira.getColuna())-(this.getLinha()+this.getColuna()));
+                        if(distanciaAnt>distanciaPro)maisProxima = lixeira;
+                    }
+                }
+            }
+        }
+        int distanciaHorizontal = (maisProxima.getColuna()-this.getColuna());
+        int distanciaVertical = (maisProxima.getLinha()-this.getLinha());
+        
+        return direcaoMaisProxima(distanciaHorizontal, distanciaVertical);
+    }
+    
+    private int direcaoLixeiraSeco(){
+        MemoriaLixeira maisProxima = null;
+        for(MemoriaLixeira lixeira : lixeiras){
+            if(lixeira.isSeco()){
+                if(!lixeira.isCheia()){
+                    if(maisProxima==null)maisProxima=lixeira;
+                    else{
+                        int distanciaAnt = Math.abs((maisProxima.getLinha()+maisProxima.getColuna())-(this.getLinha()+this.getColuna()));
+                        int distanciaPro = Math.abs((lixeira.getLinha()+lixeira.getColuna())-(this.getLinha()+this.getColuna()));
+                        if(distanciaAnt>distanciaPro)maisProxima = lixeira;
+                    }
+                }
+            }
+        }
+        int distanciaHorizontal = (maisProxima.getColuna()-this.getColuna());
+        int distanciaVertical = (maisProxima.getLinha()-this.getLinha());
+        
+        return direcaoMaisProxima(distanciaHorizontal, distanciaVertical);
+    }
+    
+    private int direcaoMaisProxima(int distanciaHorizontal,int distanciaVertical){
+        try{
+            if(distanciaHorizontal==0){
+                if(distanciaVertical>0){
+                    if(ambiente.quadranteAdjacenteVazio(getLinha(), getColuna(), 1,Ambiente.SUL)) return Ambiente.SUL;
+                    else if(ambiente.quadranteAdjacenteVazio(getLinha(), getColuna(), 1, Ambiente.LESTE)) return Ambiente.LESTE;
+                    else if(ambiente.quadranteAdjacenteVazio(getLinha(), getColuna(), 1, Ambiente.OESTE)) return Ambiente.OESTE;
+                    else return Ambiente.NORTE;
+                }else{
+                    if(ambiente.quadranteAdjacenteVazio(getLinha(), getColuna(), 1, Ambiente.NORTE)) return Ambiente.NORTE;
+                    else if(ambiente.quadranteAdjacenteVazio(getLinha(), getColuna(), 1, Ambiente.LESTE)) return Ambiente.LESTE;
+                    else if(ambiente.quadranteAdjacenteVazio(getLinha(), getColuna(), 1, Ambiente.OESTE)) return Ambiente.OESTE;
+                    else return Ambiente.SUL;
+                }
+            }else if(distanciaVertical==0){
+                if(distanciaHorizontal>0){
+                    if(ambiente.quadranteAdjacenteVazio(getLinha(), getColuna(), 1, Ambiente.OESTE)) return Ambiente.OESTE;
+                    else if(ambiente.quadranteAdjacenteVazio(getLinha(), getColuna(), 1, Ambiente.NORTE)) return Ambiente.NORTE;
+                    else if(ambiente.quadranteAdjacenteVazio(getLinha(), getColuna(), 1, Ambiente.SUL)) return Ambiente.SUL;
+                    else return Ambiente.LESTE;
+                }else{
+                    if(ambiente.quadranteAdjacenteVazio(getLinha(), getColuna(), 1, Ambiente.LESTE)) return Ambiente.LESTE;
+                    else if(ambiente.quadranteAdjacenteVazio(getLinha(), getColuna(), 1, Ambiente.NORTE)) return Ambiente.NORTE;
+                    else if(ambiente.quadranteAdjacenteVazio(getLinha(), getColuna(), 1, Ambiente.SUL)) return Ambiente.SUL;
+                    else return Ambiente.OESTE;
+                }
+            }else{
+                if(distanciaHorizontal>0){
+                    if(ambiente.quadranteAdjacenteVazio(getLinha(), getColuna(), 1,Ambiente.OESTE)) return Ambiente.OESTE;
+                    else return direcaoMaisProxima(0, distanciaVertical);
+                }else if(distanciaHorizontal<0){
+                    if(ambiente.quadranteAdjacenteVazio(getLinha(), getColuna(), 1,Ambiente.LESTE)) return Ambiente.LESTE;
+                    else return direcaoMaisProxima(0, distanciaVertical);
+                }else if(distanciaVertical>0){
+                    if(ambiente.quadranteAdjacenteVazio(getLinha(), getColuna(), 1,Ambiente.SUL)) return Ambiente.SUL;
+                    else return direcaoMaisProxima(distanciaHorizontal, 0);
+                }else{
+                    if(ambiente.quadranteAdjacenteVazio(getLinha(), getColuna(), 1,Ambiente.NORTE)) return Ambiente.NORTE;
+                    else return direcaoMaisProxima(distanciaHorizontal, 0);
+                }
+            }
+        }catch(QuadranteNotExistException ex){
+            System.out.println(ex.getMessage());
+            return (int)(Math.random()*4);
+        }
+    }
     public void jogar(){
-        while(!andar((int) (Math.random() * 4))){
-            System.out.println("O Agente "+this.getNome()+" não andou.");
+        if(sacoLxSeco.size()<maxLixo&&sacoLxOrganico.size()<maxLixo){
+            int dl = direcaoLixo();
+            if(dl==-1){
+                while(!andar((int) (Math.random() * 4),false)){
+                    System.out.println("O Agente "+this.getNome()+" não andou.");
+                }
+            }else andar(dl,false);
+        }else{
+            if(sacoLxSeco.size()==maxLixo){
+                andar(direcaoLixeiraSeco(),true);
+            }else{
+                andar(direcaoLixeiraOrganica(),true);
+            }
         }
     }
 

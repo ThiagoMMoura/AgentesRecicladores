@@ -4,7 +4,16 @@ import java.util.Iterator;
 
 /**
  * A classe Ambiente define o ambiente e a posição dos quadrantes.
- * 
+ * <dl compact>
+ * <dt>Direções<dd> A classe <code>Ambiente</code> define quatro direções em
+ * constantes, são elas:
+ * <ul>
+ * <li><code>LESTE</code></li>
+ * <li><code>OESTE</code></li>
+ * <li><code>NORTE</code></li>
+ * <li><code>SUL</code></li>
+ * </ul>
+ * </dl>
  */
 public class Ambiente {
     private final Quadrante[][] quadrantes;
@@ -220,8 +229,10 @@ public class Ambiente {
         }else return this.quadrantes[linha][coluna];
     }
     
-    public boolean quadranteAdjacenteVazio(int linha,int coluna, int direcao, int distancia){
-        return quadranteAdjacente(linha, coluna, distancia, direcao).estaVazio();
+    public boolean quadranteAdjacenteVazio(int linha,int coluna, int distancia, int direcao)throws QuadranteNotExistException{
+        if(quadranteAdjacente(linha, coluna, distancia, direcao)==null){
+            throw new QuadranteNotExistException();
+        }else return quadranteAdjacente(linha, coluna, distancia, direcao).estaVazio();
     }
     
     public boolean posicaoObstruida(int linha,int coluna){
