@@ -25,7 +25,7 @@ public class MemoriaLixeira extends Lixeira{
         return lixeira instanceof LixeiraSeco;
     }
     public void Visitada(){
-        this.qtdLixos = super.getQtdLixos();
+        this.qtdLixos = lixeira.getQtdLixos();
     }
     
     public boolean equals(Lixeira lx){

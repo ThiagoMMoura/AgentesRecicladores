@@ -1,8 +1,6 @@
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 
 /**
@@ -17,6 +15,7 @@ public class Simulador {
     private final ArrayList<Lixeira> lixeiras;
     private final ArrayList<Agente> agentes;
     private final SaidaSimulador out;
+    private int proximoAgente;
 
     public Simulador(SaidaSimulador out,int dimenssaoAmbiente,int qtdLixos,int qtdLixeiras, int qtdAgentes) {
         this.out = out;
@@ -26,6 +25,7 @@ public class Simulador {
         this.qtdAgentes = qtdAgentes;
         lixeiras = new ArrayList<>();
         agentes = new ArrayList<>();
+        proximoAgente = 0;
     }
     
     public int getDimenssao(){
@@ -53,21 +53,24 @@ public class Simulador {
     }
     
     public void iniciarCiclo(){
-        for(Agente ag: agentes){
-            ag.jogar();
+        while(proximoAgente<agentes.size()){
+            agentes.get(proximoAgente).jogar();
             out.atualizaCiclo(this.ambiente);
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(Simulador.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            proximoAgente++;
         }
+        proximoAgente = 0;
+    }
+    
+    public void iniciarProximoAgente(){
+        agentes.get(proximoAgente).jogar();
         out.atualizaCiclo(this.ambiente);
+        proximoAgente++;
+        if(proximoAgente==agentes.size())proximoAgente=0;
     }
     
     public void posicionarLixos(int qtd){
         for(int i=0;i<qtd;i++){
-            LixoSeco ls = new LixoSeco("LiS"+(i+1));
+            LixoSeco ls = new LixoSeco("S"+(i+1));
             Quadrante cs;
             do{
                 int linha = (int) (Math.random() * getDimenssao());
@@ -75,7 +78,7 @@ public class Simulador {
                 cs = ambiente.getQuadrante(linha, coluna);
             }while(!cs.estaVazio());
             cs.setPeca(ls);
-            LixoOrganico lo = new LixoOrganico("LiO"+(i+1));
+            LixoOrganico lo = new LixoOrganico("O"+(i+1));
             do{
                 int linha = (int) (Math.random() * getDimenssao());
                 int coluna = (int) (Math.random() * getDimenssao());
@@ -98,22 +101,21 @@ public class Simulador {
                         cs = ambiente.getQuadrante(linha, coluna);
                     }while(!cs.estaVazio());
                     //Bloco de IFs para impedir que as lixeiras se bloqueiem (Tentar reduzir código)
-                    if(ambiente.esquerda(linha, coluna)!=null&&
-                            (ambiente.esquerda(linha, coluna).getPeca()instanceof Lixeira)){
+                    if(ambiente.esquerda(linha, coluna)==null||
+                            ambiente.direita(linha, coluna)==null||
+                            ambiente.baixo(linha, coluna)==null||
+                            ambiente.cima(linha, coluna)==null){
                         b=true;
-                    }else if(ambiente.direita(linha, coluna)!=null&&
-                            (ambiente.direita(linha, coluna).getPeca()instanceof Lixeira)){
+                    }else if(ambiente.esquerda(linha, coluna).getPeca()instanceof Lixeira){
                         b=true;
-                    }else if(ambiente.baixo(linha, coluna)!=null&&
-                            (ambiente.baixo(linha, coluna).getPeca()instanceof Lixeira)){
+                    }else if(ambiente.direita(linha, coluna).getPeca()instanceof Lixeira){
                         b=true;
-                    }else if(ambiente.cima(linha, coluna)!=null&&
-                            (ambiente.cima(linha, coluna).getPeca()instanceof Lixeira)){
+                    }else if(ambiente.baixo(linha, coluna).getPeca()instanceof Lixeira){
                         b=true;
-                    }else b=false;
+                    }else b = ambiente.cima(linha, coluna).getPeca()instanceof Lixeira;
                 }while(b);
             }while(ambiente.posicaoObstruida(linha, coluna));
-            LixeiraSeco ls = new LixeiraSeco("LxS"+(i+1), capacidade);
+            LixeiraSeco ls = new LixeiraSeco("Ls"+(i+1), capacidade);
             ls.setLinha(linha);
             ls.setColuna(coluna);
             cs.setPeca(ls);
@@ -142,7 +144,7 @@ public class Simulador {
                     }else b=false;
                 }while(b);
             }while(ambiente.posicaoObstruida(linha, coluna));
-            LixeiraOrganico lo = new LixeiraOrganico("LxO"+(i+1), capacidade);
+            LixeiraOrganico lo = new LixeiraOrganico("Lo"+(i+1), capacidade);
             lo.setLinha(linha);
             lo.setColuna(coluna);
             cs.setPeca(lo);
@@ -183,7 +185,7 @@ public class Simulador {
             Iterator it = lixeiras.iterator();
             while(it.hasNext()) ml.add(new MemoriaLixeira((Lixeira) it.next()));
             
-            Agente ag = new Agente("AG"+(i+1), maxLixo,ml,ambiente);
+            Agente ag = new Agente("A"+(i+1), maxLixo,ml,ambiente);
             ag.setLinha(linha);
             ag.setColuna(coluna);
             qd.setPeca(ag);
@@ -191,4 +193,13 @@ public class Simulador {
         }
     }
 
+    public boolean sujeiraEliminada(){
+        if(ambiente.estaLimpo()){
+            for(Lixeira lx: lixeiras){
+                if(!lx.estaCheia())return false;
+            }
+            return true;
+        }
+        return false;
+    }
 }

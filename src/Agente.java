@@ -12,7 +12,9 @@ public class Agente extends Peca{
     private final ArrayList<Lixo> sacoLxSeco; //Saco de lixo seco, armazena objetos do tipo LixoSeco
     private final ArrayList<MemoriaLixeira> lixeiras; //Armazena a memória do agente com relação as lixeiras presentes no ambiente
     private final Ambiente ambiente;
-    private int contadorCiclos;
+    private int contadorDeCiclos;
+    private int ultimoCicloDeLixoEncontrado;
+    private int direcaoFixa;
     
     /**
      *
@@ -28,7 +30,8 @@ public class Agente extends Peca{
         sacoLxOrganico = new ArrayList<>();
         sacoLxSeco = new ArrayList<>();
         this.ambiente = ambiente;
-        this.contadorCiclos = 0;
+        this.contadorDeCiclos =0;
+        this.ultimoCicloDeLixoEncontrado = 0;
     }
     
     public int getQtdLixoOrganico(){
@@ -91,20 +94,27 @@ public class Agente extends Peca{
         }else return false;
         
     }
+    
     public void despejarLixo(Lixeira lx){
         if(lx instanceof LixeiraSeco){
             while(!sacoLxSeco.isEmpty()){
+                if(lx.estaCheia()) break;
                 lx.addLixo(sacoLxSeco.remove(0));
             }
         }else{
             while(!sacoLxOrganico.isEmpty()){
+                if(lx.estaCheia()) break;
                 lx.addLixo(sacoLxOrganico.remove(0));
             }
         }
     }
+    
     public void visitarLixeira(Lixeira lx){
         for(MemoriaLixeira lxs: lixeiras){
-            if(lxs.equals(lx))lxs.Visitada();
+            if(lxs.equals(lx)){
+                lxs.Visitada();
+                System.out.println(lxs.getNome()+" foi visitada.");
+            }
         }
     }
     private Quadrante[][] perceberAmbiente(){
@@ -146,22 +156,6 @@ public class Agente extends Peca{
         return -1;
     }
     
-    private void andarDirecaoLixeiraMaisProxima(){
-        MemoriaLixeira maisProxima = null;
-        for(MemoriaLixeira lixeira : lixeiras){
-            if(!lixeira.isCheia()){
-                if(maisProxima==null)maisProxima=lixeira;
-                else{
-                    int distanciaAnt = Math.abs((maisProxima.getLinha()+maisProxima.getColuna())-(this.getLinha()+this.getColuna()));
-                    int distanciaPro = Math.abs((lixeira.getLinha()+lixeira.getColuna())-(this.getLinha()+this.getColuna()));
-                    if(distanciaAnt>distanciaPro)maisProxima = lixeira;
-                }
-            }
-        }
-        int distanciaHorizontal = (maisProxima.getColuna()-this.getColuna());
-        int distanciaVertical = (maisProxima.getLinha()-this.getLinha());
-        andarDirecaoMaisProxima(distanciaHorizontal, distanciaVertical);
-    }
     private boolean andarDirecaoLixeiraOrganica(){
         MemoriaLixeira maisProxima = null;
         for(MemoriaLixeira lixeira : lixeiras){
@@ -178,7 +172,7 @@ public class Agente extends Peca{
         }
         int distanciaHorizontal = (maisProxima.getColuna()-this.getColuna());
         int distanciaVertical = (maisProxima.getLinha()-this.getLinha());
-        System.out.println("Horizontal: "+distanciaHorizontal+" | Vertical: "+distanciaVertical);
+        System.out.println(maisProxima.getNome()+" - Horizontal: "+distanciaHorizontal+" | Vertical: "+distanciaVertical);
         return andarDirecaoMaisProxima(distanciaHorizontal, distanciaVertical);
     }
     
@@ -198,7 +192,7 @@ public class Agente extends Peca{
         }
         int distanciaHorizontal = (maisProxima.getColuna()-this.getColuna());
         int distanciaVertical = (maisProxima.getLinha()-this.getLinha());
-        System.out.println("Horizontal: "+distanciaHorizontal+" | Vertical: "+distanciaVertical);
+        System.out.println(maisProxima.getNome()+" - Horizontal: "+distanciaHorizontal+" | Vertical: "+distanciaVertical);
         return andarDirecaoMaisProxima(distanciaHorizontal, distanciaVertical);
     }
     
@@ -245,6 +239,8 @@ public class Agente extends Peca{
     }
     
     public void jogar(){
+        contadorDeCiclos++;
+        System.out.println("Ciclo "+contadorDeCiclos+" do Agente "+getNome());
         if(!ambiente.estaLimpo()&&sacoLxSeco.size()<maxLixo&&sacoLxOrganico.size()<maxLixo){
             /**
              * Se o ambiente não estiver limpo e se nenhum dos sacos de lixo 
@@ -252,16 +248,17 @@ public class Agente extends Peca{
              */
             int dl = direcaoLixo();
             if(dl==-1){
-                if(contadorCiclos<3){
+                if(contadorDeCiclos-ultimoCicloDeLixoEncontrado<=3){
                     /**
                      * Se o Agente não tiver encontrado nenhum lixo ao seu redor
                      * ele vai numa direção aleatória.
                      */
                     int direcao;
-                    do{
-                        direcao = (int) (Math.random() * 4);
-                    }while(!andar(direcao,false));
-                    contadorCiclos++;
+                    if(!ambiente.posicaoObstruida(getLinha(), getColuna())){
+                        do{
+                            direcao = (int) (Math.random() * 4);
+                        }while(!andar(direcao,false));
+                    }
                 }else{
                     /**
                      * Se a 3 ciclos o agente não encontrar nenhum lixo, ele vai
@@ -269,25 +266,55 @@ public class Agente extends Peca{
                      */
                     int[] direcoes = new int[]{Ambiente.LESTE,Ambiente.OESTE};
                     int direcao;
-                    do{
-                        direcao = direcoes[(int)(Math.random()*direcoes.length)];
-                    }while(!andar(direcao,false));
+                    if(contadorDeCiclos-ultimoCicloDeLixoEncontrado==3){
+                        if(!ambiente.quadranteAdjacenteVazio(getLinha(), getColuna(), 1, Ambiente.LESTE)&&
+                                !ambiente.quadranteAdjacenteVazio(getLinha(), getColuna(), 1, Ambiente.OESTE)){
+                            direcoes = new int[]{Ambiente.NORTE,Ambiente.SUL};
+                        }
+                        if(!ambiente.posicaoObstruida(getLinha(), getColuna())){
+                            do{
+                                direcao = direcoes[(int)(Math.random()*direcoes.length)];
+                            }while(!andar(direcao,false));
+                            direcaoFixa = direcao;
+                        }
+                    }else{
+                        if(!andar(direcaoFixa, false)){
+                            if(!ambiente.posicaoObstruida(getLinha(), getColuna())){
+                                direcoes = new int[]{Ambiente.NORTE,Ambiente.SUL};
+                                if(!ambiente.quadranteAdjacenteVazio(getLinha(), getColuna(), 1, Ambiente.NORTE)&&
+                                        !ambiente.quadranteAdjacenteVazio(getLinha(), getColuna(), 1, Ambiente.SUL)){
+                                    direcoes = new int[]{Ambiente.LESTE,Ambiente.OESTE};
+                                }
+                                do{
+                                    direcao = direcoes[(int)(Math.random()*direcoes.length)];
+                                }while(!andar(direcao,false));
+                                ultimoCicloDeLixoEncontrado=contadorDeCiclos;
+                            }
+                        }
+                    }
                 }
             }else {
                 andar(dl,false);
-                contadorCiclos = 0;
+                ultimoCicloDeLixoEncontrado = contadorDeCiclos;
             }
         }else{
             /**
              * Se um dos sacos de lixo do agente estiver cheio ou es o ambiente já
              * estive limpo, ele vai atrás de uma lixeira para despejar o lixo.
              */
-            if(sacoLxSeco.size()==maxLixo){
-                andarDirecaoLixeiraSeco();
-            }else if(sacoLxOrganico.size()==maxLixo){
-                andarDirecaoLixeiraOrganica();
-            }else andarDirecaoLixeiraMaisProxima();
+            if(sacoLxSeco.size()==maxLixo) andarDirecaoLixeiraSeco();
+            else if(sacoLxOrganico.size()==maxLixo) andarDirecaoLixeiraOrganica();
+            else if(sacoLxSeco.size()>0) andarDirecaoLixeiraSeco();
+            else if(sacoLxOrganico.size()>0)andarDirecaoLixeiraOrganica();
+            else {
+                int direcao;
+                do{
+                    direcao = (int) (Math.random() * 4);
+                }while(!andar(direcao,false));
+            }
+            ultimoCicloDeLixoEncontrado = contadorDeCiclos;
         }
+        System.out.println("Ultimo ciclo em que foi encontrado lixo: "+ultimoCicloDeLixoEncontrado);
     }
 
 }

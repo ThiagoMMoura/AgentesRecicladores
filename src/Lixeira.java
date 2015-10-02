@@ -7,8 +7,8 @@ import java.util.ArrayList;
  * @author Thiago Moura
  */
 public class Lixeira extends Peca{
-    private int capacidade;
-    private ArrayList<Lixo> lixos;
+    private final int capacidade;
+    private final ArrayList<Lixo> lixos;
 
     public Lixeira(String nome, int capacidade) {
         super(nome);
@@ -24,6 +24,10 @@ public class Lixeira extends Peca{
         return lixos.size();
     }
     
+    public boolean estaCheia(){
+        return capacidade == lixos.size();
+    }
+    
     public boolean addLixo(Lixo lx){
         if(lixos.size()<capacidade){
             System.out.println("Recebido lixo: "+lx.getNome());
@@ -34,7 +38,7 @@ public class Lixeira extends Peca{
     
     @Override
     public String getNome(){
-        return super.getNome()+"["+(capacidade-getQtdLixos())+"]";
+        return super.getNome();
     }
 
 }

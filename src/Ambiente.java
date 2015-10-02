@@ -30,7 +30,7 @@ public class Ambiente {
         this.quadrantes = new Quadrante[dimenssao][dimenssao];
         this.lixeiras = new ArrayList<>();
         this.agentes = new ArrayList<>();
-        inicializaCasas();
+        inicializaQuadrantes();
     }
 
     public Quadrante[][] getQuadrantes() {
@@ -60,7 +60,7 @@ public class Ambiente {
         return agentes;
     }
     
-    private void inicializaCasas(){
+    private void inicializaQuadrantes(){
         for(int l=0;l<this.dimenssao;l++){
             for(int c=0;c<this.dimenssao;c++){
                 this.quadrantes[l][c] = new Quadrante(l,c);
@@ -103,9 +103,9 @@ public class Ambiente {
         }else return this.quadrantes[linha][coluna];
     }
     
-    public boolean quadranteAdjacenteVazio(int linha,int coluna, int distancia, int direcao)throws QuadranteNotExistException{
+    public boolean quadranteAdjacenteVazio(int linha,int coluna, int distancia, int direcao){
         if(quadranteAdjacente(linha, coluna, distancia, direcao)==null){
-            throw new QuadranteNotExistException();
+            return false;
         }else return quadranteAdjacente(linha, coluna, distancia, direcao).estaVazio();
     }
     
@@ -158,4 +158,5 @@ public class Ambiente {
         }
         return true;
     }
+
 }

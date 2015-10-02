@@ -1,4 +1,5 @@
 
+import com.sun.javafx.css.Style;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.util.*;
@@ -53,11 +54,14 @@ public class Tela extends javax.swing.JFrame implements SaidaSimulador{
         scrollAmbiente = new javax.swing.JScrollPane();
         painelScrollAmbiente = new javax.swing.JPanel();
         painelAmbiente = new javax.swing.JPanel();
+        painelInformacoes = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        campoInformacoes = new javax.swing.JTextPane();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Agentes Recicladores");
 
-        painelPai.setLayout(new java.awt.BorderLayout());
+        painelPai.setLayout(new java.awt.BorderLayout(5, 0));
 
         barra.setFloatable(false);
         barra.setRollover(true);
@@ -126,13 +130,18 @@ public class Tela extends javax.swing.JFrame implements SaidaSimulador{
         btnProximoAgente.setFocusable(false);
         btnProximoAgente.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnProximoAgente.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnProximoAgente.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnProximoAgenteActionPerformed(evt);
+            }
+        });
         barra.add(btnProximoAgente);
 
         javax.swing.GroupLayout painelBarraLayout = new javax.swing.GroupLayout(painelBarra);
         painelBarra.setLayout(painelBarraLayout);
         painelBarraLayout.setHorizontalGroup(
             painelBarraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(barra, javax.swing.GroupLayout.DEFAULT_SIZE, 579, Short.MAX_VALUE)
+            .addComponent(barra, javax.swing.GroupLayout.DEFAULT_SIZE, 816, Short.MAX_VALUE)
         );
         painelBarraLayout.setVerticalGroup(
             painelBarraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -161,26 +170,48 @@ public class Tela extends javax.swing.JFrame implements SaidaSimulador{
         painelFilhoAmbiente.setLayout(painelFilhoAmbienteLayout);
         painelFilhoAmbienteLayout.setHorizontalGroup(
             painelFilhoAmbienteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(scrollAmbiente, javax.swing.GroupLayout.DEFAULT_SIZE, 579, Short.MAX_VALUE)
+            .addComponent(scrollAmbiente, javax.swing.GroupLayout.DEFAULT_SIZE, 561, Short.MAX_VALUE)
         );
         painelFilhoAmbienteLayout.setVerticalGroup(
             painelFilhoAmbienteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(scrollAmbiente, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 429, Short.MAX_VALUE)
+            .addComponent(scrollAmbiente, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 511, Short.MAX_VALUE)
         );
 
         painelPai.add(painelFilhoAmbiente, java.awt.BorderLayout.CENTER);
         painelFilhoAmbiente.getAccessibleContext().setAccessibleName("Tabuleiro");
         painelFilhoAmbiente.getAccessibleContext().setAccessibleDescription("");
 
+        painelInformacoes.setPreferredSize(new java.awt.Dimension(250, 429));
+
+        campoInformacoes.setEditable(false);
+        campoInformacoes.setBackground(new java.awt.Color(255, 255, 204));
+        campoInformacoes.setContentType("text/html"); // NOI18N
+        campoInformacoes.setText("<html>\r\n  <head>\r\n\r\n  </head>\r\n  <body>\r\n    <p style=\"margin-top: 0\">\r\n\n    </p>\r\n  </body>\r\n</html>\r\n");
+        campoInformacoes.setToolTipText("");
+        jScrollPane1.setViewportView(campoInformacoes);
+
+        javax.swing.GroupLayout painelInformacoesLayout = new javax.swing.GroupLayout(painelInformacoes);
+        painelInformacoes.setLayout(painelInformacoesLayout);
+        painelInformacoesLayout.setHorizontalGroup(
+            painelInformacoesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 250, Short.MAX_VALUE)
+        );
+        painelInformacoesLayout.setVerticalGroup(
+            painelInformacoesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 511, Short.MAX_VALUE)
+        );
+
+        painelPai.add(painelInformacoes, java.awt.BorderLayout.WEST);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(painelPai, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 579, Short.MAX_VALUE)
+            .addComponent(painelPai, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(painelPai, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 476, Short.MAX_VALUE)
+            .addComponent(painelPai, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 558, Short.MAX_VALUE)
         );
 
         pack();
@@ -230,6 +261,10 @@ public class Tela extends javax.swing.JFrame implements SaidaSimulador{
         simulador.iniciarCiclo();
     }//GEN-LAST:event_btnProximoCicloActionPerformed
 
+    private void btnProximoAgenteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnProximoAgenteActionPerformed
+        simulador.iniciarProximoAgente();
+    }//GEN-LAST:event_btnProximoAgenteActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -269,11 +304,14 @@ public class Tela extends javax.swing.JFrame implements SaidaSimulador{
     private javax.swing.JToolBar barra;
     private javax.swing.JButton btnProximoAgente;
     private javax.swing.JButton btnProximoCiclo;
+    private javax.swing.JTextPane campoInformacoes;
     private javax.swing.ButtonGroup gupoTamanho;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JToolBar.Separator jSeparator1;
     private javax.swing.JPanel painelAmbiente;
     private javax.swing.JPanel painelBarra;
     private javax.swing.JPanel painelFilhoAmbiente;
+    private javax.swing.JPanel painelInformacoes;
     private javax.swing.JPanel painelPai;
     private javax.swing.JPanel painelScrollAmbiente;
     private javax.swing.JScrollPane scrollAmbiente;
@@ -295,7 +333,7 @@ public class Tela extends javax.swing.JFrame implements SaidaSimulador{
     }
     
     private void criarAmbiente(){
-        Dimension d = new Dimension(dimenssao*50, dimenssao*50);
+        Dimension d = new Dimension(dimenssao*40, dimenssao*40);
         painelAmbiente.removeAll();
         
         painelAmbiente.setLayout(new java.awt.GridLayout(dimenssao, dimenssao));
@@ -310,11 +348,11 @@ public class Tela extends javax.swing.JFrame implements SaidaSimulador{
         criarQuadrantes();
         atualizaCiclo(simulador.getAmbiente());
     }
+    
     private void criarQuadrantes(){
         this.quadrantes = new JLabel[dimenssao][dimenssao];
-        int d = dimenssao;
-        for(int l=0;l<d;l++){
-            for(int c=0;c<d;c++){
+        for(int l=0;l<dimenssao;l++){
+            for(int c=0;c<dimenssao;c++){
                 JLabel jl = new JLabel();
                 Border eb = new LineBorder(Color.BLACK);
                 jl.setBorder(eb);
@@ -338,14 +376,59 @@ public class Tela extends javax.swing.JFrame implements SaidaSimulador{
                 else quadrantes[l][c].setText(qd.getPeca().getNome());
             }
         }
-        System.out.println("-------INICIO CICLO--------");
-        for(Lixeira lx:simulador.getLixeiras()){
-            System.out.println(lx.getNome()+" - Posição: "+lx.getLinha()+"x"+lx.getColuna()+" - Ocupado: "+lx.getQtdLixos()+"/"+lx.getCapacidade());
-        }
+        
+        String style="<style type=\"text/css\">" +
+                "  table{" +
+                "     border-bottom: 1px #CCCCCC solid;" +
+                "     border-right: 1px #CCCCCC solid;" +
+                "     margin-bottom: 5px;"+
+                "  }" +
+                "  th, td{" +
+                "	  border-left:1px #CCCCCC solid;" +
+                "	  border-top:1px #CCCCCC solid;" +
+                "  }" +
+                "  td {" +
+                "	text-align: center;" +
+                "}" +
+                "</style>";
+        String informacoes="<html>" +
+                "<head>"+style+"</head><body>";
+        informacoes+="<h3 style=\"text-align:center;\">Agentes</h3>"
+                + "<div>";
         for(Agente ag:simulador.getAgentes()){
-            System.out.println(ag.getNome()+" - Posição: "+ag.getLinha()+"x"+ag.getColuna()+" - Lixo orgânico: "+ag.getQtdLixoOrganico()+"/"+ag.getMaxLixo()+" - Lixo Seco: "+ag.getQtdLixoSeco()+"/"+ag.getMaxLixo());
+            informacoes+="<table border=\"0\" cellpadding=\"2\" align=\"center\" cellspacing=\"0\">" +
+                    "<tr>" +
+                    "<th rowspan=\"2\" scope=\"col\">"+ag.getNome()+"</th>" +
+                    "<th colspan=\"2\" scope=\"col\"><h4>Saco Lixo Seco</h4></th>" +
+                    "<th colspan=\"2\" scope=\"col\"><h4>Saco Lixo Orgânico</h4></th>" +
+                    "</tr>"+
+                    "<tr>" +
+                    "<td>"+ag.getQtdLixoSeco()+"</td>" +
+                    "<td>"+ag.getMaxLixo()+"</td>" +
+                    "<td>"+ag.getQtdLixoOrganico()+"</td>" +
+                    "<td>"+ag.getMaxLixo()+"</td>" +
+                    "</tr>"+
+                    "</table>";
         }
-        System.out.println("-------FIM CICLO--------");
+        informacoes+="</div>";
+        informacoes+="<h3 style=\"text-align:center;\">Lixeiras</h3>"
+                + "<div>";
+        for(Lixeira lx:simulador.getLixeiras()){
+            informacoes+="<table border=\"0\" cellpadding=\"2\" align=\"center\" cellspacing=\"0\">" +
+                    "<tr>" +
+                    "<th rowspan=\"2\" scope=\"col\">"+lx.getNome()+"</th>" +
+                    "<th scope=\"col\"><h4>Ocupado</h4></th>" +
+                    "<th scope=\"col\"><h4>Capacidade</h4></th>" +
+                    "</tr>"+
+                    "<tr>" +
+                    "<td>"+lx.getQtdLixos()+"</td>" +
+                    "<td>"+lx.getCapacidade()+"</td>" +
+                    "</tr>"+
+                    "</table>";
+        }
+        informacoes+="</div>";
+        informacoes+="</body></html>";
+        campoInformacoes.setText(informacoes);
     }
 
 }
