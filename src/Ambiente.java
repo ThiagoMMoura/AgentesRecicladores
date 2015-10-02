@@ -68,132 +68,6 @@ public class Ambiente {
         }
     }
     
-    public void posicionarLixos(int qtd){
-        for(int i=0;i<qtd;i++){
-            LixoSeco ls = new LixoSeco("LiS"+(i+1));
-            Quadrante cs;
-            do{
-                int linha = (int) (Math.random() * dimenssao);
-                int coluna = (int) (Math.random() * dimenssao);
-                cs = getQuadrante(linha, coluna);
-            }while(!cs.estaVazio());
-            cs.setPeca(ls);
-            LixoOrganico lo = new LixoOrganico("LiO"+(i+1));
-            do{
-                int linha = (int) (Math.random() * dimenssao);
-                int coluna = (int) (Math.random() * dimenssao);
-                cs = getQuadrante(linha, coluna);
-            }while(!cs.estaVazio());
-            cs.setPeca(lo);
-        }
-    }
-    
-    public void posicionarLixeiras(int qtd,int capacidade){
-        Quadrante cs;
-        int linha,coluna;
-        for(int i=0;i<qtd;i++){
-            boolean b;
-            do{
-                do{
-                    do{
-                        linha = (int) (Math.random() * dimenssao);
-                        coluna = (int) (Math.random() * dimenssao);
-                        cs = getQuadrante(linha, coluna);
-                    }while(!cs.estaVazio());
-                    //Bloco de IFs para impedir que as lixeiras se bloqueiem (Tentar reduzir código)
-                    if(esquerda(linha, coluna)!=null&&
-                            (esquerda(linha, coluna).getPeca()instanceof Lixeira)){
-                        b=true;
-                    }else if(direita(linha, coluna)!=null&&
-                            (direita(linha, coluna).getPeca()instanceof Lixeira)){
-                        b=true;
-                    }else if(baixo(linha, coluna)!=null&&
-                            (baixo(linha, coluna).getPeca()instanceof Lixeira)){
-                        b=true;
-                    }else if(cima(linha, coluna)!=null&&
-                            (cima(linha, coluna).getPeca()instanceof Lixeira)){
-                        b=true;
-                    }else b=false;
-                }while(b);
-            }while(posicaoObstruida(linha, coluna));
-            LixeiraSeco ls = new LixeiraSeco("LxS"+(i+1), capacidade);
-            ls.setLinha(linha);
-            ls.setColuna(coluna);
-            cs.setPeca(ls);
-            this.lixeiras.add(ls);
-            
-            do{
-                do{
-                    do{
-                        linha = (int) (Math.random() * dimenssao);
-                        coluna = (int) (Math.random() * dimenssao);
-                        cs = getQuadrante(linha, coluna);
-                    }while(!cs.estaVazio());
-                    //Bloco de IFs para impedir que as lixeiras se bloqueiem (Tentar reduzir código)
-                    if(esquerda(linha, coluna)!=null&&
-                            (esquerda(linha, coluna).getPeca()instanceof Lixeira)){
-                        b=true;
-                    }else if(direita(linha, coluna)!=null&&
-                            (direita(linha, coluna).getPeca()instanceof Lixeira)){
-                        b=true;
-                    }else if(baixo(linha, coluna)!=null&&
-                            (baixo(linha, coluna).getPeca()instanceof Lixeira)){
-                        b=true;
-                    }else if(cima(linha, coluna)!=null&&
-                            (cima(linha, coluna).getPeca()instanceof Lixeira)){
-                        b=true;
-                    }else b=false;
-                }while(b);
-            }while(posicaoObstruida(linha, coluna));
-            LixeiraOrganico lo = new LixeiraOrganico("LxO"+(i+1), capacidade);
-            lo.setLinha(linha);
-            lo.setColuna(coluna);
-            cs.setPeca(lo);
-            this.lixeiras.add(lo);
-        }
-    }
-    public void posicionarAgentes(int qtd,int maxLixo,ArrayList<Lixeira> lxs,Ambiente ambiente){
-        //Implementar posicionamento dos Agentes no Ambiente
-        Quadrante qd;
-        int linha,coluna;
-        for(int i=0;i<qtd;i++){
-            boolean b;
-            do{
-                do{
-                    do{
-                        linha = (int) (Math.random() * dimenssao);
-                        coluna = (int) (Math.random() * dimenssao);
-                        qd = getQuadrante(linha, coluna);
-                    }while(!qd.estaVazio());
-                    //Bloco de IFs para impedir que os Agentes se bloqueiem (Tentar reduzir código)
-                    if(esquerda(linha, coluna)!=null&&
-                            (esquerda(linha, coluna).getPeca()instanceof Agente)){
-                        b=true;
-                    }else if(direita(linha, coluna)!=null&&
-                            (direita(linha, coluna).getPeca()instanceof Agente)){
-                        b=true;
-                    }else if(baixo(linha, coluna)!=null&&
-                            (baixo(linha, coluna).getPeca()instanceof Agente)){
-                        b=true;
-                    }else if(cima(linha, coluna)!=null&&
-                            (cima(linha, coluna).getPeca()instanceof Agente)){
-                        b=true;
-                    }else b=false;
-                }while(b);
-            }while(posicaoObstruida(linha, coluna));
-            
-            ArrayList<MemoriaLixeira> ml = new ArrayList<>();
-            Iterator it = lxs.iterator();
-            while(it.hasNext()) ml.add(new MemoriaLixeira((Lixeira) it.next()));
-            
-            Agente ag = new Agente("AG"+(i+1), maxLixo,ml,ambiente);
-            ag.setLinha(linha);
-            ag.setColuna(coluna);
-            qd.setPeca(ag);
-            this.agentes.add(ag);
-        }
-    }
-
     /**
      * Método para buscar uma posição em uma das laterais de uma casa
      * 
@@ -274,5 +148,14 @@ public class Ambiente {
     }
     public Quadrante baixo(int linha, int coluna, int distancia){
         return quadranteAdjacente(linha, coluna, distancia, SUL);
+    }
+    
+    public boolean estaLimpo(){
+        for(int l=0;l<dimenssao;l++){
+            for(int c=0;c<dimenssao;c++){
+                if(quadrantes[l][c].temLixo())return false;
+            }
+        }
+        return true;
     }
 }

@@ -12,6 +12,7 @@ public class Agente extends Peca{
     private final ArrayList<Lixo> sacoLxSeco; //Saco de lixo seco, armazena objetos do tipo LixoSeco
     private final ArrayList<MemoriaLixeira> lixeiras; //Armazena a memória do agente com relação as lixeiras presentes no ambiente
     private final Ambiente ambiente;
+    private int contadorCiclos;
     
     /**
      *
@@ -27,6 +28,7 @@ public class Agente extends Peca{
         sacoLxOrganico = new ArrayList<>();
         sacoLxSeco = new ArrayList<>();
         this.ambiente = ambiente;
+        this.contadorCiclos = 0;
     }
     
     public int getQtdLixoOrganico(){
@@ -144,7 +146,23 @@ public class Agente extends Peca{
         return -1;
     }
     
-    private int direcaoLixeiraOrganica(){
+    private void andarDirecaoLixeiraMaisProxima(){
+        MemoriaLixeira maisProxima = null;
+        for(MemoriaLixeira lixeira : lixeiras){
+            if(!lixeira.isCheia()){
+                if(maisProxima==null)maisProxima=lixeira;
+                else{
+                    int distanciaAnt = Math.abs((maisProxima.getLinha()+maisProxima.getColuna())-(this.getLinha()+this.getColuna()));
+                    int distanciaPro = Math.abs((lixeira.getLinha()+lixeira.getColuna())-(this.getLinha()+this.getColuna()));
+                    if(distanciaAnt>distanciaPro)maisProxima = lixeira;
+                }
+            }
+        }
+        int distanciaHorizontal = (maisProxima.getColuna()-this.getColuna());
+        int distanciaVertical = (maisProxima.getLinha()-this.getLinha());
+        andarDirecaoMaisProxima(distanciaHorizontal, distanciaVertical);
+    }
+    private boolean andarDirecaoLixeiraOrganica(){
         MemoriaLixeira maisProxima = null;
         for(MemoriaLixeira lixeira : lixeiras){
             if(lixeira.isOrganico()){
@@ -160,11 +178,11 @@ public class Agente extends Peca{
         }
         int distanciaHorizontal = (maisProxima.getColuna()-this.getColuna());
         int distanciaVertical = (maisProxima.getLinha()-this.getLinha());
-        
-        return direcaoMaisProxima(distanciaHorizontal, distanciaVertical);
+        System.out.println("Horizontal: "+distanciaHorizontal+" | Vertical: "+distanciaVertical);
+        return andarDirecaoMaisProxima(distanciaHorizontal, distanciaVertical);
     }
     
-    private int direcaoLixeiraSeco(){
+    private boolean  andarDirecaoLixeiraSeco(){
         MemoriaLixeira maisProxima = null;
         for(MemoriaLixeira lixeira : lixeiras){
             if(lixeira.isSeco()){
@@ -180,70 +198,95 @@ public class Agente extends Peca{
         }
         int distanciaHorizontal = (maisProxima.getColuna()-this.getColuna());
         int distanciaVertical = (maisProxima.getLinha()-this.getLinha());
-        
-        return direcaoMaisProxima(distanciaHorizontal, distanciaVertical);
+        System.out.println("Horizontal: "+distanciaHorizontal+" | Vertical: "+distanciaVertical);
+        return andarDirecaoMaisProxima(distanciaHorizontal, distanciaVertical);
     }
     
-    private int direcaoMaisProxima(int distanciaHorizontal,int distanciaVertical){
-        try{
-            if(distanciaHorizontal==0){
-                if(distanciaVertical>0){
-                    if(ambiente.quadranteAdjacenteVazio(getLinha(), getColuna(), 1,Ambiente.SUL)) return Ambiente.SUL;
-                    else if(ambiente.quadranteAdjacenteVazio(getLinha(), getColuna(), 1, Ambiente.LESTE)) return Ambiente.LESTE;
-                    else if(ambiente.quadranteAdjacenteVazio(getLinha(), getColuna(), 1, Ambiente.OESTE)) return Ambiente.OESTE;
-                    else return Ambiente.NORTE;
-                }else{
-                    if(ambiente.quadranteAdjacenteVazio(getLinha(), getColuna(), 1, Ambiente.NORTE)) return Ambiente.NORTE;
-                    else if(ambiente.quadranteAdjacenteVazio(getLinha(), getColuna(), 1, Ambiente.LESTE)) return Ambiente.LESTE;
-                    else if(ambiente.quadranteAdjacenteVazio(getLinha(), getColuna(), 1, Ambiente.OESTE)) return Ambiente.OESTE;
-                    else return Ambiente.SUL;
-                }
-            }else if(distanciaVertical==0){
-                if(distanciaHorizontal>0){
-                    if(ambiente.quadranteAdjacenteVazio(getLinha(), getColuna(), 1, Ambiente.OESTE)) return Ambiente.OESTE;
-                    else if(ambiente.quadranteAdjacenteVazio(getLinha(), getColuna(), 1, Ambiente.NORTE)) return Ambiente.NORTE;
-                    else if(ambiente.quadranteAdjacenteVazio(getLinha(), getColuna(), 1, Ambiente.SUL)) return Ambiente.SUL;
-                    else return Ambiente.LESTE;
-                }else{
-                    if(ambiente.quadranteAdjacenteVazio(getLinha(), getColuna(), 1, Ambiente.LESTE)) return Ambiente.LESTE;
-                    else if(ambiente.quadranteAdjacenteVazio(getLinha(), getColuna(), 1, Ambiente.NORTE)) return Ambiente.NORTE;
-                    else if(ambiente.quadranteAdjacenteVazio(getLinha(), getColuna(), 1, Ambiente.SUL)) return Ambiente.SUL;
-                    else return Ambiente.OESTE;
-                }
+    private boolean andarDirecaoMaisProxima(int distanciaHorizontal, int distanciaVertical){
+        if(distanciaHorizontal==0){
+            if(distanciaVertical<0){
+                if (andar(Ambiente.NORTE, true)) return true;
+                else if(andar(Ambiente.OESTE,true)) return true;
+                else if(andar(Ambiente.LESTE,true)) return true;
+                else return andar(Ambiente.SUL, true);  
             }else{
-                if(distanciaHorizontal>0){
-                    if(ambiente.quadranteAdjacenteVazio(getLinha(), getColuna(), 1,Ambiente.OESTE)) return Ambiente.OESTE;
-                    else return direcaoMaisProxima(0, distanciaVertical);
-                }else if(distanciaHorizontal<0){
-                    if(ambiente.quadranteAdjacenteVazio(getLinha(), getColuna(), 1,Ambiente.LESTE)) return Ambiente.LESTE;
-                    else return direcaoMaisProxima(0, distanciaVertical);
-                }else if(distanciaVertical>0){
-                    if(ambiente.quadranteAdjacenteVazio(getLinha(), getColuna(), 1,Ambiente.SUL)) return Ambiente.SUL;
-                    else return direcaoMaisProxima(distanciaHorizontal, 0);
-                }else{
-                    if(ambiente.quadranteAdjacenteVazio(getLinha(), getColuna(), 1,Ambiente.NORTE)) return Ambiente.NORTE;
-                    else return direcaoMaisProxima(distanciaHorizontal, 0);
-                }
+                if (andar(Ambiente.SUL, true)) return true;
+                else if(andar(Ambiente.OESTE,true)) return true;
+                else if(andar(Ambiente.LESTE,true)) return true;
+                else return andar(Ambiente.NORTE, true);  
             }
-        }catch(QuadranteNotExistException ex){
-            System.out.println(ex.getMessage());
-            return (int)(Math.random()*4);
+        }else if(distanciaVertical==0){
+            if(distanciaHorizontal<0){
+                if (andar(Ambiente.LESTE, true)) return true;
+                else if(andar(Ambiente.NORTE,true)) return true;
+                else if(andar(Ambiente.SUL,true)) return true;
+                else return andar(Ambiente.OESTE, true);  
+            }else{
+                if (andar(Ambiente.OESTE, true)) return true;
+                else if(andar(Ambiente.SUL,true)) return true;
+                else if(andar(Ambiente.LESTE,true)) return true;
+                else return andar(Ambiente.NORTE, true);  
+            }
+        }else{
+            if(distanciaHorizontal<0){
+                if(andar(Ambiente.LESTE,true)) return true;
+                else return andarDirecaoMaisProxima(0, distanciaVertical);
+            }else if(distanciaHorizontal>0){
+                if(andar(Ambiente.OESTE,true)) return true;
+                else return andarDirecaoMaisProxima(0, distanciaVertical);
+            }else if(distanciaVertical<0){
+                if(andar(Ambiente.NORTE,true)) return true;
+                else return andarDirecaoMaisProxima(distanciaHorizontal, 0);
+            }else{
+                if(andar(Ambiente.SUL,true)) return true;
+                else return andarDirecaoMaisProxima(distanciaHorizontal, 0);
+            }
         }
     }
+    
     public void jogar(){
-        if(sacoLxSeco.size()<maxLixo&&sacoLxOrganico.size()<maxLixo){
+        if(!ambiente.estaLimpo()&&sacoLxSeco.size()<maxLixo&&sacoLxOrganico.size()<maxLixo){
+            /**
+             * Se o ambiente não estiver limpo e se nenhum dos sacos de lixo 
+             * estiver cheio o Agente vai em busca de lixo;
+             */
             int dl = direcaoLixo();
             if(dl==-1){
-                while(!andar((int) (Math.random() * 4),false)){
-                    System.out.println("O Agente "+this.getNome()+" não andou.");
+                if(contadorCiclos<3){
+                    /**
+                     * Se o Agente não tiver encontrado nenhum lixo ao seu redor
+                     * ele vai numa direção aleatória.
+                     */
+                    int direcao;
+                    do{
+                        direcao = (int) (Math.random() * 4);
+                    }while(!andar(direcao,false));
+                    contadorCiclos++;
+                }else{
+                    /**
+                     * Se a 3 ciclos o agente não encontrar nenhum lixo, ele vai
+                     * anda em linha, escolhendo esquerda ou direita aleatóriamente.
+                     */
+                    int[] direcoes = new int[]{Ambiente.LESTE,Ambiente.OESTE};
+                    int direcao;
+                    do{
+                        direcao = direcoes[(int)(Math.random()*direcoes.length)];
+                    }while(!andar(direcao,false));
                 }
-            }else andar(dl,false);
-        }else{
-            if(sacoLxSeco.size()==maxLixo){
-                andar(direcaoLixeiraSeco(),true);
-            }else{
-                andar(direcaoLixeiraOrganica(),true);
+            }else {
+                andar(dl,false);
+                contadorCiclos = 0;
             }
+        }else{
+            /**
+             * Se um dos sacos de lixo do agente estiver cheio ou es o ambiente já
+             * estive limpo, ele vai atrás de uma lixeira para despejar o lixo.
+             */
+            if(sacoLxSeco.size()==maxLixo){
+                andarDirecaoLixeiraSeco();
+            }else if(sacoLxOrganico.size()==maxLixo){
+                andarDirecaoLixeiraOrganica();
+            }else andarDirecaoLixeiraMaisProxima();
         }
     }
 

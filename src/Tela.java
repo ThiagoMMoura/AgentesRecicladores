@@ -9,18 +9,24 @@ import javax.swing.border.*;
  *
  * @author Thiago Moura
  */
-public class Tela extends javax.swing.JFrame implements MundoAgente{
+public class Tela extends javax.swing.JFrame implements SaidaSimulador{
     private JLabel[][] quadrantes;
     private ArrayList<JMenuItem> itens;
-    private Deus deus;
+    private Simulador simulador;
+    private boolean ambienteIniciado;
+    private int dimenssao;
+    private int qtdLixos;
+    private int qtdLixeiras;
+    private int qtdAgentes;
     /**
      * Creates new form Tela
      */
     public Tela(){
         initComponents();
-        inicializar();
-        visualizarPainel(painelFilhoIniciar.getName());
+        inicializaBotoes();
         this.setLocationRelativeTo(null);
+        selPequenoActionPerformed(null);
+        this.ambienteIniciado = false;
     }
 
     /**
@@ -32,209 +38,197 @@ public class Tela extends javax.swing.JFrame implements MundoAgente{
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        gupoTamanho = new javax.swing.ButtonGroup();
         painelPai = new javax.swing.JPanel();
-        painelCamadas = new javax.swing.JLayeredPane();
-        painelFilhoTabuleiro = new javax.swing.JPanel();
+        painelBarra = new javax.swing.JPanel();
+        barra = new javax.swing.JToolBar();
+        selPequeno = new javax.swing.JToggleButton();
+        selMedio = new javax.swing.JToggleButton();
+        selGrande = new javax.swing.JToggleButton();
+        jSeparator1 = new javax.swing.JToolBar.Separator();
+        selIniciar = new javax.swing.JToggleButton();
+        btnProximoCiclo = new javax.swing.JButton();
+        btnProximoAgente = new javax.swing.JButton();
+        painelFilhoAmbiente = new javax.swing.JPanel();
         scrollAmbiente = new javax.swing.JScrollPane();
         painelScrollAmbiente = new javax.swing.JPanel();
         painelAmbiente = new javax.swing.JPanel();
-        painelFilhoIniciar = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        btnPequeno = new javax.swing.JButton();
-        btnMedio = new javax.swing.JButton();
-        btnGrande = new javax.swing.JButton();
-        barraMenus = new javax.swing.JMenuBar();
-        menuPrincipal = new javax.swing.JMenu();
-        itemInicio = new javax.swing.JMenuItem();
-        menuCiclo = new javax.swing.JMenu();
-        btnIniciarCiclo = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Agentes Recicladores");
 
-        painelCamadas.setAutoscrolls(true);
+        painelPai.setLayout(new java.awt.BorderLayout());
 
-        painelAmbiente.setLayout(new java.awt.GridLayout());
+        barra.setFloatable(false);
+        barra.setRollover(true);
+
+        gupoTamanho.add(selPequeno);
+        selPequeno.setSelected(true);
+        selPequeno.setText("Pequeno");
+        selPequeno.setFocusable(false);
+        selPequeno.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        selPequeno.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        selPequeno.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                selPequenoActionPerformed(evt);
+            }
+        });
+        barra.add(selPequeno);
+
+        gupoTamanho.add(selMedio);
+        selMedio.setText("Médio");
+        selMedio.setFocusable(false);
+        selMedio.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        selMedio.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        selMedio.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                selMedioActionPerformed(evt);
+            }
+        });
+        barra.add(selMedio);
+
+        gupoTamanho.add(selGrande);
+        selGrande.setText("Grande");
+        selGrande.setFocusable(false);
+        selGrande.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        selGrande.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        selGrande.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                selGrandeActionPerformed(evt);
+            }
+        });
+        barra.add(selGrande);
+        barra.add(jSeparator1);
+
+        selIniciar.setText("Iniciar");
+        selIniciar.setFocusable(false);
+        selIniciar.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        selIniciar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        selIniciar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                selIniciarActionPerformed(evt);
+            }
+        });
+        barra.add(selIniciar);
+
+        btnProximoCiclo.setText("Próximo Ciclo");
+        btnProximoCiclo.setFocusable(false);
+        btnProximoCiclo.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnProximoCiclo.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnProximoCiclo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnProximoCicloActionPerformed(evt);
+            }
+        });
+        barra.add(btnProximoCiclo);
+
+        btnProximoAgente.setText("Próximo Agente");
+        btnProximoAgente.setFocusable(false);
+        btnProximoAgente.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnProximoAgente.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        barra.add(btnProximoAgente);
+
+        javax.swing.GroupLayout painelBarraLayout = new javax.swing.GroupLayout(painelBarra);
+        painelBarra.setLayout(painelBarraLayout);
+        painelBarraLayout.setHorizontalGroup(
+            painelBarraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(barra, javax.swing.GroupLayout.DEFAULT_SIZE, 579, Short.MAX_VALUE)
+        );
+        painelBarraLayout.setVerticalGroup(
+            painelBarraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(barra, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
+        );
+
+        painelPai.add(painelBarra, java.awt.BorderLayout.PAGE_START);
+
+        painelAmbiente.setBackground(new java.awt.Color(255, 255, 255));
+        painelAmbiente.setLayout(new java.awt.GridLayout(1, 0));
 
         javax.swing.GroupLayout painelScrollAmbienteLayout = new javax.swing.GroupLayout(painelScrollAmbiente);
         painelScrollAmbiente.setLayout(painelScrollAmbienteLayout);
         painelScrollAmbienteLayout.setHorizontalGroup(
             painelScrollAmbienteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(painelScrollAmbienteLayout.createSequentialGroup()
-                .addComponent(painelAmbiente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 395, Short.MAX_VALUE))
+            .addComponent(painelAmbiente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
         painelScrollAmbienteLayout.setVerticalGroup(
             painelScrollAmbienteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(painelScrollAmbienteLayout.createSequentialGroup()
-                .addComponent(painelAmbiente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 281, Short.MAX_VALUE))
+            .addComponent(painelAmbiente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
 
         scrollAmbiente.setViewportView(painelScrollAmbiente);
 
-        javax.swing.GroupLayout painelFilhoTabuleiroLayout = new javax.swing.GroupLayout(painelFilhoTabuleiro);
-        painelFilhoTabuleiro.setLayout(painelFilhoTabuleiroLayout);
-        painelFilhoTabuleiroLayout.setHorizontalGroup(
-            painelFilhoTabuleiroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(scrollAmbiente)
+        javax.swing.GroupLayout painelFilhoAmbienteLayout = new javax.swing.GroupLayout(painelFilhoAmbiente);
+        painelFilhoAmbiente.setLayout(painelFilhoAmbienteLayout);
+        painelFilhoAmbienteLayout.setHorizontalGroup(
+            painelFilhoAmbienteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(scrollAmbiente, javax.swing.GroupLayout.DEFAULT_SIZE, 579, Short.MAX_VALUE)
         );
-        painelFilhoTabuleiroLayout.setVerticalGroup(
-            painelFilhoTabuleiroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(scrollAmbiente)
-        );
-
-        jLabel1.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText("Selecione o tamanho do Ambiente:");
-
-        btnPequeno.setText("Pequeno");
-        btnPequeno.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnPequenoActionPerformed(evt);
-            }
-        });
-
-        btnMedio.setText("Médio");
-        btnMedio.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnMedioActionPerformed(evt);
-            }
-        });
-
-        btnGrande.setText("Grande");
-        btnGrande.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnGrandeActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout painelFilhoIniciarLayout = new javax.swing.GroupLayout(painelFilhoIniciar);
-        painelFilhoIniciar.setLayout(painelFilhoIniciarLayout);
-        painelFilhoIniciarLayout.setHorizontalGroup(
-            painelFilhoIniciarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelFilhoIniciarLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 377, Short.MAX_VALUE)
-                .addContainerGap())
-            .addGroup(painelFilhoIniciarLayout.createSequentialGroup()
-                .addGap(160, 160, 160)
-                .addGroup(painelFilhoIniciarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(btnPequeno, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnMedio, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnGrande, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        painelFilhoIniciarLayout.setVerticalGroup(
-            painelFilhoIniciarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(painelFilhoIniciarLayout.createSequentialGroup()
-                .addGap(37, 37, 37)
-                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(btnPequeno)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnMedio)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnGrande)
-                .addContainerGap(95, Short.MAX_VALUE))
+        painelFilhoAmbienteLayout.setVerticalGroup(
+            painelFilhoAmbienteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(scrollAmbiente, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 429, Short.MAX_VALUE)
         );
 
-        javax.swing.GroupLayout painelCamadasLayout = new javax.swing.GroupLayout(painelCamadas);
-        painelCamadas.setLayout(painelCamadasLayout);
-        painelCamadasLayout.setHorizontalGroup(
-            painelCamadasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(painelFilhoIniciar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addGroup(painelCamadasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addComponent(painelFilhoTabuleiro, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        painelCamadasLayout.setVerticalGroup(
-            painelCamadasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(painelFilhoIniciar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addGroup(painelCamadasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addComponent(painelFilhoTabuleiro, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        painelCamadas.setLayer(painelFilhoTabuleiro, javax.swing.JLayeredPane.DEFAULT_LAYER);
-
-        painelFilhoTabuleiro.getAccessibleContext().setAccessibleName("Tabuleiro");
-        painelFilhoTabuleiro.getAccessibleContext().setAccessibleDescription("");
-        painelCamadas.setLayer(painelFilhoIniciar, javax.swing.JLayeredPane.DEFAULT_LAYER);
-        painelFilhoIniciar.getAccessibleContext().setAccessibleName("Iniciar");
-
-        javax.swing.GroupLayout painelPaiLayout = new javax.swing.GroupLayout(painelPai);
-        painelPai.setLayout(painelPaiLayout);
-        painelPaiLayout.setHorizontalGroup(
-            painelPaiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 397, Short.MAX_VALUE)
-            .addGroup(painelPaiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addComponent(painelCamadas))
-        );
-        painelPaiLayout.setVerticalGroup(
-            painelPaiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 283, Short.MAX_VALUE)
-            .addGroup(painelPaiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addComponent(painelCamadas))
-        );
-
-        menuPrincipal.setText("Menu");
-
-        itemInicio.setText("Inicio");
-        itemInicio.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                itemInicioActionPerformed(evt);
-            }
-        });
-        menuPrincipal.add(itemInicio);
-
-        barraMenus.add(menuPrincipal);
-
-        menuCiclo.setText("Ciclo");
-
-        btnIniciarCiclo.setText("Iniciar");
-        btnIniciarCiclo.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnIniciarCicloActionPerformed(evt);
-            }
-        });
-        menuCiclo.add(btnIniciarCiclo);
-
-        barraMenus.add(menuCiclo);
-
-        setJMenuBar(barraMenus);
+        painelPai.add(painelFilhoAmbiente, java.awt.BorderLayout.CENTER);
+        painelFilhoAmbiente.getAccessibleContext().setAccessibleName("Tabuleiro");
+        painelFilhoAmbiente.getAccessibleContext().setAccessibleDescription("");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(painelPai, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(painelPai, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 579, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(painelPai, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(painelPai, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 476, Short.MAX_VALUE)
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnPequenoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPequenoActionPerformed
-        iniciarAmbiente(6,6,2,2);
-    }//GEN-LAST:event_btnPequenoActionPerformed
+    private void selPequenoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selPequenoActionPerformed
+        this.qtdLixos = 6;
+        this.qtdLixeiras = 2;
+        this.qtdAgentes = 2;
+        this.dimenssao = 6;
+        criarAmbiente();
+    }//GEN-LAST:event_selPequenoActionPerformed
 
-    private void itemInicioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemInicioActionPerformed
-        visualizarPainel(this.painelFilhoIniciar.getName());
-    }//GEN-LAST:event_itemInicioActionPerformed
+    private void selMedioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selMedioActionPerformed
+        this.qtdLixos = 20;
+        this.qtdLixeiras = 4;
+        this.qtdAgentes = 6;
+        this.dimenssao = 15;
+        criarAmbiente();
+    }//GEN-LAST:event_selMedioActionPerformed
 
-    private void btnMedioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMedioActionPerformed
-        iniciarAmbiente(15,20,4,6);
-    }//GEN-LAST:event_btnMedioActionPerformed
+    private void selGrandeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selGrandeActionPerformed
+        this.qtdLixos = 45;
+        this.qtdLixeiras = 8;
+        this.qtdAgentes = 10;
+        this.dimenssao = 30;
+        criarAmbiente();
+    }//GEN-LAST:event_selGrandeActionPerformed
 
-    private void btnGrandeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGrandeActionPerformed
-        iniciarAmbiente(30,45,8,10);
-    }//GEN-LAST:event_btnGrandeActionPerformed
+    private void selIniciarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selIniciarActionPerformed
+        if(selIniciar.isSelected()){
+            btnProximoAgente.setEnabled(true);
+            btnProximoCiclo.setEnabled(true);
+            selPequeno.setEnabled(false);
+            selMedio.setEnabled(false);
+            selGrande.setEnabled(false);
+            if(!ambienteIniciado){
+                iniciarAmbiente();
+                ambienteIniciado = true;
+            }
+        }else{
+            inicializaBotoes();
+        }
+    }//GEN-LAST:event_selIniciarActionPerformed
 
-    private void btnIniciarCicloActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIniciarCicloActionPerformed
-        System.out.println("Iniciando Ciclo...");
-        deus.iniciarCiclo();
-    }//GEN-LAST:event_btnIniciarCicloActionPerformed
+    private void btnProximoCicloActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnProximoCicloActionPerformed
+        simulador.iniciarCiclo();
+    }//GEN-LAST:event_btnProximoCicloActionPerformed
 
     /**
      * @param args the command line arguments
@@ -272,48 +266,35 @@ public class Tela extends javax.swing.JFrame implements MundoAgente{
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JMenuBar barraMenus;
-    private javax.swing.JButton btnGrande;
-    private javax.swing.JMenuItem btnIniciarCiclo;
-    private javax.swing.JButton btnMedio;
-    private javax.swing.JButton btnPequeno;
-    private javax.swing.JMenuItem itemInicio;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JMenu menuCiclo;
-    private javax.swing.JMenu menuPrincipal;
+    private javax.swing.JToolBar barra;
+    private javax.swing.JButton btnProximoAgente;
+    private javax.swing.JButton btnProximoCiclo;
+    private javax.swing.ButtonGroup gupoTamanho;
+    private javax.swing.JToolBar.Separator jSeparator1;
     private javax.swing.JPanel painelAmbiente;
-    private javax.swing.JLayeredPane painelCamadas;
-    private javax.swing.JPanel painelFilhoIniciar;
-    private javax.swing.JPanel painelFilhoTabuleiro;
+    private javax.swing.JPanel painelBarra;
+    private javax.swing.JPanel painelFilhoAmbiente;
     private javax.swing.JPanel painelPai;
     private javax.swing.JPanel painelScrollAmbiente;
     private javax.swing.JScrollPane scrollAmbiente;
+    private javax.swing.JToggleButton selGrande;
+    private javax.swing.JToggleButton selIniciar;
+    private javax.swing.JToggleButton selMedio;
+    private javax.swing.JToggleButton selPequeno;
     // End of variables declaration//GEN-END:variables
 
-    private void inicializar(){
-        painelFilhoIniciar.setName("Iniciar");
-        painelFilhoTabuleiro.setName("Tabuleiro");
+    private void inicializaBotoes(){
+        btnProximoAgente.setEnabled(false);
+        btnProximoCiclo.setEnabled(false);
+        selPequeno.setEnabled(true);
+        selMedio.setEnabled(true);
+        selGrande.setEnabled(true);
+    }
+    private void iniciarAmbiente(){
+        simulador.iniciarAmbiente();
     }
     
-    private void visualizarPainel(String nome){
-        painelFilhoIniciar.setVisible(painelFilhoIniciar.getName().equalsIgnoreCase(nome));
-        painelFilhoTabuleiro.setVisible(painelFilhoTabuleiro.getName().equalsIgnoreCase(nome));
-        menuCiclo.setEnabled(painelFilhoTabuleiro.getName().equalsIgnoreCase(nome));
-    }
-    private void iniciarAmbiente(int dimenssao,int lixos,int lixeiras,int agentes){
-        criarAmbiente(dimenssao);
-        
-        this.deus = new Deus(this,dimenssao,lixos,lixeiras,agentes);
-        
-        //ambiente.posicionarLixos(lixos);
-        //ambiente.posicionarLixeiras(lixeiras, lixos/lixeiras);
-        //ambiente.posicionarAgentes(agentes, dimenssao/2,ambiente.getLixeiras(),ambiente);
-        
-        deus.iniciarAmbiente();
-        
-        visualizarPainel(painelFilhoTabuleiro.getName());
-    }
-    private void criarAmbiente(int dimenssao){
+    private void criarAmbiente(){
         Dimension d = new Dimension(dimenssao*50, dimenssao*50);
         painelAmbiente.removeAll();
         
@@ -325,9 +306,11 @@ public class Tela extends javax.swing.JFrame implements MundoAgente{
         
         painelScrollAmbiente.setPreferredSize(d);
         
-        criarQuadrantes(dimenssao);
+        this.simulador = new Simulador(this,dimenssao,qtdLixos,qtdLixeiras,qtdAgentes);
+        criarQuadrantes();
+        atualizaCiclo(simulador.getAmbiente());
     }
-    private void criarQuadrantes(int dimenssao){
+    private void criarQuadrantes(){
         this.quadrantes = new JLabel[dimenssao][dimenssao];
         int d = dimenssao;
         for(int l=0;l<d;l++){
@@ -337,7 +320,7 @@ public class Tela extends javax.swing.JFrame implements MundoAgente{
                 jl.setBorder(eb);
                 jl.setHorizontalAlignment(JLabel.CENTER);
                 
-                jl.setText("");
+                jl.setText(" ");
                 
                 quadrantes[l][c] = jl;
                 painelAmbiente.add(quadrantes[l][c]);
@@ -356,10 +339,10 @@ public class Tela extends javax.swing.JFrame implements MundoAgente{
             }
         }
         System.out.println("-------INICIO CICLO--------");
-        for(Lixeira lx:deus.getLixeiras()){
+        for(Lixeira lx:simulador.getLixeiras()){
             System.out.println(lx.getNome()+" - Posição: "+lx.getLinha()+"x"+lx.getColuna()+" - Ocupado: "+lx.getQtdLixos()+"/"+lx.getCapacidade());
         }
-        for(Agente ag:deus.getAgentes()){
+        for(Agente ag:simulador.getAgentes()){
             System.out.println(ag.getNome()+" - Posição: "+ag.getLinha()+"x"+ag.getColuna()+" - Lixo orgânico: "+ag.getQtdLixoOrganico()+"/"+ag.getMaxLixo()+" - Lixo Seco: "+ag.getQtdLixoSeco()+"/"+ag.getMaxLixo());
         }
         System.out.println("-------FIM CICLO--------");

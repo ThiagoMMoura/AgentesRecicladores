@@ -31,4 +31,14 @@ public class MemoriaLixeira extends Lixeira{
     public boolean equals(Lixeira lx){
         return lx.getNome().equals(this.lixeira.getNome());
     }
+    
+    @Override
+    public int getLinha(){
+        return lixeira.getLinha();
+    }
+    
+    @Override
+    public int getColuna(){
+        return lixeira.getColuna();
+    }
 }
