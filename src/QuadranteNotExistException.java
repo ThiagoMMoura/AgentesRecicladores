@@ -1,8 +1,4 @@
 
-/**
- *
- * @author Thiago Moura
- */
 public class QuadranteNotExistException extends Exception{
 
     public QuadranteNotExistException() {

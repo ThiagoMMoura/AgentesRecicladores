@@ -14,9 +14,9 @@ public class Tela extends javax.swing.JFrame implements SaidaSimulador{
     private boolean ambienteIniciado;
     private boolean pausado;
     private int dimenssao;
+    private int qtdAgentes;
     private int qtdLixos;
     private int qtdLixeiras;
-    private int qtdAgentes;
     /**
      * Creates new form Tela
      */
@@ -24,7 +24,7 @@ public class Tela extends javax.swing.JFrame implements SaidaSimulador{
         initComponents();
         inicializaBotoes();
         this.setLocationRelativeTo(null);
-        selPequenoActionPerformed(null);
+        setAmbientePequeno();
         this.ambienteIniciado = false;
         this.pausado = true;
     }
@@ -234,31 +234,19 @@ public class Tela extends javax.swing.JFrame implements SaidaSimulador{
     }// </editor-fold>//GEN-END:initComponents
 
     private void selPequenoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selPequenoActionPerformed
-        this.qtdLixos = 6;
-        this.qtdLixeiras = 2;
-        this.qtdAgentes = 2;
-        this.dimenssao = 6;
-        criarAmbiente();
+        setAmbientePequeno();
     }//GEN-LAST:event_selPequenoActionPerformed
 
     private void selMedioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selMedioActionPerformed
-        this.qtdLixos = 20;
-        this.qtdLixeiras = 4;
-        this.qtdAgentes = 6;
-        this.dimenssao = 15;
-        criarAmbiente();
+        setAmbienteMedio();
     }//GEN-LAST:event_selMedioActionPerformed
 
     private void selGrandeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selGrandeActionPerformed
-        this.qtdLixos = 45;
-        this.qtdLixeiras = 8;
-        this.qtdAgentes = 10;
-        this.dimenssao = 30;
-        criarAmbiente();
+        setAmbienteGrande();
     }//GEN-LAST:event_selGrandeActionPerformed
 
     private void btnSimluarCicloActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSimluarCicloActionPerformed
-        simulador.iniciarCiclo();
+        simulador.start(true);
     }//GEN-LAST:event_btnSimluarCicloActionPerformed
 
     private void btnSimularAgenteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSimularAgenteActionPerformed
@@ -288,9 +276,7 @@ public class Tela extends javax.swing.JFrame implements SaidaSimulador{
     }//GEN-LAST:event_btnIniciarActionPerformed
 
     private void btnSimularActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSimularActionPerformed
-        while(!simulador.sujeiraEliminada()){
-            simulador.iniciarCiclo();
-        }
+        simulador.start(false);
     }//GEN-LAST:event_btnSimularActionPerformed
 
     /**
@@ -363,6 +349,7 @@ public class Tela extends javax.swing.JFrame implements SaidaSimulador{
     }
     private void iniciarAmbiente(){
         ambienteIniciado = simulador.iniciarAmbiente();
+        atualizarInformacoes();
     }
     
     private void criarAmbiente(){
@@ -370,7 +357,7 @@ public class Tela extends javax.swing.JFrame implements SaidaSimulador{
         pausado = false;
         btnIniciar.setText("Iniciar");
         
-        Dimension d = new Dimension(dimenssao*40, dimenssao*40);
+        Dimension d = new Dimension(dimenssao*50, dimenssao*50);
         painelAmbiente.removeAll();
         
         painelAmbiente.setLayout(new java.awt.GridLayout(dimenssao, dimenssao));
@@ -409,73 +396,129 @@ public class Tela extends javax.swing.JFrame implements SaidaSimulador{
         for(int l=0;l<d;l++){
             for(int c=0;c<d;c++){
                 Quadrante qd = ambiente.getQuadrante(l, c);
-                if(qd.estaVazio())quadrantes[l][c].setText("");
-                else quadrantes[l][c].setText(qd.getPeca().getNome());
+                quadrantes[l][c].setText("");
+                if(qd.estaVazio())quadrantes[l][c].setIcon(new ImageIcon(getClass().getResource("/icones/vazio.png")));
+                else quadrantes[l][c].setIcon(qd.getPeca().getIcon());
             }
         }
-        
+        if(ambienteIniciado){
+            atualizarInformacoes();
+        }else campoInformacoes.setText("");
+    }
+    
+    public void atualizarInformacoes(){
         String style="<style type=\"text/css\">" +
-                "body{" +
-                    "font-family: Verdana;" +
-                    "font-style:normal;" +
-                    "font-size: 9px;" +
-                "}" +
-                "#maior{" +
-                    "font-size:11px;" +
-                "}" +
-                "th{" +
-                    "font-size:12px;" +
-                "}" +
-                "  table{" +
-                "     border-bottom: 1px #CCCCCC solid;" +
-                "     border-right: 1px #CCCCCC solid;" +
-                "     margin-bottom: 5px;"+
-                "  }" +
-                "  th, td{" +
-                "	  border-left:1px #CCCCCC solid;" +
-                "	  border-top:1px #CCCCCC solid;" +
-                "	text-align: center;" +
-                "  }" +
-                "</style>";
-        String informacoes="<html>" +
-                "<head>"+style+"</head><body>";
-        informacoes+="<h2 style=\"text-align:center;\">Agentes</h2>"
-                + "<div>";
-        for(Agente ag:simulador.getAgentes()){
-            informacoes+="<table border=\"0\" cellpadding=\"4\" align=\"center\" cellspacing=\"0\">" +
-                    "<tr>" +
-                    "<th rowspan=\"2\">"+ag.getNome()+"</th>" +
-                    "<td colspan=\"2\">Saco Lixo Seco</td>" +
-                    "<td colspan=\"2\">Saco Lixo Orgânico</td>" +
-                    "</tr>"+
-                    "<tr>" +
-                    "<td id=\"maior\">"+ag.getQtdLixoSeco()+"</td>" +
-                    "<td id=\"maior\">"+ag.getMaxLixo()+"</td>" +
-                    "<td id=\"maior\">"+ag.getQtdLixoOrganico()+"</td>" +
-                    "<td id=\"maior\">"+ag.getMaxLixo()+"</td>" +
-                    "</tr>"+
-                    "</table>";
-        }
-        informacoes+="</div>";
-        informacoes+="<h2 style=\"text-align:center;\">Lixeiras</h2>"
-                + "<div>";
-        for(Lixeira lx:simulador.getLixeiras()){
-            informacoes+="<table border=\"0\" cellpadding=\"4\" align=\"center\" cellspacing=\"0\">" +
-                    "<tr>" +
-                    "<th rowspan=\"2\">"+lx.getNome()+"</th>" +
-                    "<td>Ocupado</td>" +
-                    "<td>Capacidade</td>" +
-                    "</tr>"+
-                    "<tr>" +
-                    "<td id=\"maior\">"+lx.getQtdLixos()+"</td>" +
-                    "<td id=\"maior\">"+lx.getCapacidade()+"</td>" +
-                    "</tr>"+
-                    "</table>";
-        }
-        informacoes+="</div>";
-        informacoes+="</body></html>";
-        campoInformacoes.setText(informacoes);
-        paintComponents(this.getGraphics());
+                    "body{" +
+                        "font-family: Verdana;" +
+                        "font-style:normal;" +
+                        "font-size: 9px;" +
+                    "}" +
+                    "#maior{" +
+                        "font-size:11px;" +
+                    "}" +
+                    "th{" +
+                        "font-size:12px;" +
+                    "}" +
+                    "  table{" +
+                    "     border-bottom: 1px #CCCCCC solid;" +
+                    "     border-right: 1px #CCCCCC solid;" +
+                    "     margin-bottom: 5px;"+
+                    "  }" +
+                    "  th, td{" +
+                    "	  border-left:1px #CCCCCC solid;" +
+                    "	  border-top:1px #CCCCCC solid;" +
+                    "	text-align: center;" +
+                    "  }" +
+                    "</style>";
+            String informacoes="<html>" +
+                    "<head>"+style+"</head><body>";
+            informacoes+="<h2 style=\"text-align:center;\">Agentes</h2>"
+                    + "<div>";
+            for(Agente ag:simulador.getAgentes()){
+                informacoes+="<table border=\"0\" cellpadding=\"4\" align=\"center\" cellspacing=\"0\">" +
+                        "<tr>" +
+                        "<th rowspan=\"2\"><img src=\""+ag.getIcon().toString()+"\"></th>" +
+                        "<td colspan=\"2\">Saco Lixo Seco</td>" +
+                        "<td colspan=\"2\">Saco Lixo Orgânico</td>" +
+                        "</tr>"+
+                        "<tr>" +
+                        "<td id=\"maior\">"+ag.getQtdLixoSeco()+"</td>" +
+                        "<td id=\"maior\">"+ag.getMaxLixo()+"</td>" +
+                        "<td id=\"maior\">"+ag.getQtdLixoOrganico()+"</td>" +
+                        "<td id=\"maior\">"+ag.getMaxLixo()+"</td>" +
+                        "</tr>"+
+                        "</table>";
+            }
+            informacoes+="</div>";
+            informacoes+="<h2 style=\"text-align:center;\">Lixeiras Seco</h2>"
+                    + "<div>";
+            for(Lixeira lx:simulador.getLixeiras()){
+                if(lx instanceof LixeiraSeco)informacoes+="<table border=\"0\" cellpadding=\"4\" align=\"center\" cellspacing=\"0\">" +
+                        "<tr>" +
+                        "<th rowspan=\"2\"><img src=\""+lx.getIcon().toString()+"\"></th>" +
+                        "<td>Ocupado</td>" +
+                        "<td>Capacidade</td>" +
+                        "</tr>"+
+                        "<tr>" +
+                        "<td id=\"maior\">"+lx.getQtdLixos()+"</td>" +
+                        "<td id=\"maior\">"+lx.getCapacidade()+"</td>" +
+                        "</tr>"+
+                        "</table>";
+            }
+            informacoes+="</div>";
+            informacoes+="<h2 style=\"text-align:center;\">Lixeiras Orgânico</h2>"
+                    + "<div>";
+            for(Lixeira lx:simulador.getLixeiras()){
+                if(lx instanceof LixeiraOrganico)informacoes+="<table border=\"0\" cellpadding=\"4\" align=\"center\" cellspacing=\"0\">" +
+                        "<tr>" +
+                        "<th rowspan=\"2\"><img src=\""+lx.getIcon().toString()+"\"></th>" +
+                        "<td>Ocupado</td>" +
+                        "<td>Capacidade</td>" +
+                        "</tr>"+
+                        "<tr>" +
+                        "<td id=\"maior\">"+lx.getQtdLixos()+"</td>" +
+                        "<td id=\"maior\">"+lx.getCapacidade()+"</td>" +
+                        "</tr>"+
+                        "</table>";
+            }
+            informacoes+="</div>";
+            informacoes+="</body></html>";
+            campoInformacoes.setText(informacoes);
+    }
+
+    @Override
+    public final void setAmbientePequeno() {
+        this.qtdLixos = 6;
+        this.qtdLixeiras = 1;
+        this.qtdAgentes = 2;
+        this.dimenssao = 6;
+        criarAmbiente();
+    }
+
+    @Override
+    public void setAmbienteMedio() {
+        this.qtdLixos = 20;
+        this.qtdLixeiras = 2;
+        this.qtdAgentes = 3;
+        this.dimenssao = 12;
+        criarAmbiente();
+    }
+
+    @Override
+    public void setAmbienteGrande() {
+        this.qtdLixos = 40;
+        this.qtdLixeiras = 4;
+        this.qtdAgentes = 6;
+        this.dimenssao = 18;
+        criarAmbiente();
+    }
+
+    @Override
+    public void setSimulacao(boolean ativa) {
+        btnIniciar.setEnabled(!ativa);
+        btnSimluarCiclo.setEnabled(!ativa);
+        btnSimular.setEnabled(!ativa);
+        btnSimularAgente.setEnabled(!ativa);
     }
 
 }

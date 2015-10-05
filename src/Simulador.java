@@ -3,13 +3,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.ImageIcon;
 
-
-/**
- *
- * @author Thiago Moura
- */
-public class Simulador {
+public class Simulador{
     private final Ambiente ambiente;
     private final int qtdLixos;
     private final int qtdLixeiras;
@@ -18,6 +14,8 @@ public class Simulador {
     private final ArrayList<Agente> agentes;
     private final SaidaSimulador out;
     private int proximoAgente;
+    private boolean umCiclo;
+    private int tempo;
 
     public Simulador(SaidaSimulador out,int dimenssaoAmbiente,int qtdLixos,int qtdLixeiras, int qtdAgentes) {
         this.out = out;
@@ -28,6 +26,8 @@ public class Simulador {
         lixeiras = new ArrayList<>();
         agentes = new ArrayList<>();
         proximoAgente = 0;
+        umCiclo = false;
+        tempo = 400;
     }
     
     public int getDimenssao(){
@@ -61,7 +61,7 @@ public class Simulador {
             out.atualizaCiclo(this.ambiente);
             proximoAgente++;
                 try {
-                    Thread.sleep(400);
+                    Thread.sleep(tempo);
                 } catch (InterruptedException ex) {
                     Logger.getLogger(Tela.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -78,7 +78,9 @@ public class Simulador {
     
     public void posicionarLixos(int qtd){
         for(int i=0;i<qtd;i++){
+            int n = (int) (Math.random()*4+1);
             LixoSeco ls = new LixoSeco("S"+(i+1));
+            ls.setIcon(new ImageIcon(getClass().getResource("/icones/Lixo Seco"+n+".png")));
             Quadrante cs;
             do{
                 int linha = (int) (Math.random() * getDimenssao());
@@ -86,7 +88,10 @@ public class Simulador {
                 cs = ambiente.getQuadrante(linha, coluna);
             }while(!cs.estaVazio());
             cs.setPeca(ls);
+            
+            n = (int) (Math.random()*4+1);
             LixoOrganico lo = new LixoOrganico("O"+(i+1));
+            lo.setIcon(new ImageIcon(getClass().getResource("/icones/Lixo Organico"+n+".png")));
             do{
                 int linha = (int) (Math.random() * getDimenssao());
                 int coluna = (int) (Math.random() * getDimenssao());
@@ -128,6 +133,7 @@ public class Simulador {
             LixeiraSeco ls = new LixeiraSeco("Ls"+(i+1), capacidade);
             ls.setLinha(linha);
             ls.setColuna(coluna);
+            ls.setIcon(new ImageIcon(getClass().getResource("/icones/Lixeira Seco"+(i+1)+".png")));
             cs.setPeca(ls);
             this.lixeiras.add(ls);
             
@@ -158,6 +164,7 @@ public class Simulador {
             LixeiraOrganico lo = new LixeiraOrganico("Lo"+(i+1), capacidade);
             lo.setLinha(linha);
             lo.setColuna(coluna);
+            lo.setIcon(new ImageIcon(getClass().getResource("/icones/Lixeira Organico"+(i+1)+".png")));
             cs.setPeca(lo);
             this.lixeiras.add(lo);
         }
@@ -199,6 +206,7 @@ public class Simulador {
             Agente ag = new Agente("A"+(i+1), maxLixo,ml,ambiente);
             ag.setLinha(linha);
             ag.setColuna(coluna);
+            ag.setIcon(new ImageIcon(getClass().getResource("/icones/Agente"+(i+1)+".png")));
             qd.setPeca(ag);
             this.agentes.add(ag);
         }
@@ -253,5 +261,33 @@ public class Simulador {
             return true;
         }
         return false;
+    }
+    
+    public void start(boolean umCiclo){
+        setUmCiclo(umCiclo);
+        NovaThread nt= new NovaThread();
+        nt.start();
+    }
+    
+public class NovaThread extends Thread{
+    @Override
+    public void run(){
+        out.setSimulacao(true);
+        if(umCiclo){
+            iniciarCiclo();
+        }else{
+            while(!sujeiraEliminada()){
+                iniciarCiclo();
+            }
+        }
+        out.setSimulacao(false);
+    }
+}
+    public void setUmCiclo(boolean umCiclo) {
+        this.umCiclo = umCiclo;
+    }
+
+    public void setTempoEsperaParaProximoAgente(int tempo) {
+        this.tempo = tempo;
     }
 }

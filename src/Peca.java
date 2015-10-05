@@ -1,12 +1,12 @@
 
-/**
- *
- * @author Thiago Moura
- */
+import javax.swing.Icon;
+
+
 public class Peca {
     private String nome;
     private int linha;
     private int coluna;
+    private Icon icon;
 
     public Peca(String nome) {
         this.nome = nome;
@@ -34,6 +34,14 @@ public class Peca {
 
     public void setColuna(int coluna) {
         this.coluna = coluna;
+    }
+
+    public Icon getIcon() {
+        return icon;
+    }
+
+    public void setIcon(Icon icon) {
+        this.icon = icon;
     }
     
 }

@@ -1,8 +1,4 @@
 
-/**
- *
- * @author Thiago Moura
- */
 public class LixeiraOrganico extends Lixeira{
 
     public LixeiraOrganico(String nome, int capacidade) {

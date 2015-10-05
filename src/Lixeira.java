@@ -1,11 +1,6 @@
 
 import java.util.ArrayList;
 
-
-/**
- *
- * @author Thiago Moura
- */
 public class Lixeira extends Peca{
     private final int capacidade;
     private final ArrayList<Lixo> lixos;

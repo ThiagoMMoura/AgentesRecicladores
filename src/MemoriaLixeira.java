@@ -4,7 +4,7 @@
  * 
  */
 public class MemoriaLixeira extends Lixeira{
-    private Lixeira lixeira;
+    private final Lixeira lixeira;
     private int qtdLixos;
         
     public MemoriaLixeira(Lixeira lixeira){
