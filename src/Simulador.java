@@ -109,7 +109,9 @@ public class Simulador {
                         cs = ambiente.getQuadrante(linha, coluna);
                     }while(!cs.estaVazio());
                     //Bloco de IFs para impedir que as lixeiras se bloqueiem (Tentar reduzir código)
-                    if(ambiente.esquerda(linha, coluna)==null||
+                    if(isCantoBloqueado(linha, coluna)){
+                        b=true;
+                    }else if(ambiente.esquerda(linha, coluna)==null||
                             ambiente.direita(linha, coluna)==null||
                             ambiente.baixo(linha, coluna)==null||
                             ambiente.cima(linha, coluna)==null){
@@ -137,7 +139,9 @@ public class Simulador {
                         cs = ambiente.getQuadrante(linha, coluna);
                     }while(!cs.estaVazio());
                     //Bloco de IFs para impedir que as lixeiras se bloqueiem (Tentar reduzir código)
-                    if(ambiente.esquerda(linha, coluna)==null||
+                    if(isCantoBloqueado(linha, coluna)){
+                        b=true;
+                    }else if(ambiente.esquerda(linha, coluna)==null||
                             ambiente.direita(linha, coluna)==null||
                             ambiente.baixo(linha, coluna)==null||
                             ambiente.cima(linha, coluna)==null){
@@ -199,7 +203,48 @@ public class Simulador {
             this.agentes.add(ag);
         }
     }
-
+    
+    /**
+     * Método para verificar se a lixeira inserida na posição definida pelos 
+     * parâmetros não bloqueará os cantos do ambiente, podendo deixar trancado
+     * um lixo ou agente.
+     * 
+     * @param linha
+     * @param coluna
+     * @return <code>true</code> - Se existir outra lixeira que formará bloqueio,
+     * caso contrário retorna <code>false</code>.
+     */
+    public boolean isCantoBloqueado(int linha, int coluna){
+        boolean b;
+        int dim = ambiente.getDimenssao();
+        if(linha==0 && coluna==1 && 
+                ambiente.getQuadrante(1, 0).temLixeira()){
+            b=true;
+        }else if(linha==1 && coluna==0 && 
+                ambiente.getQuadrante(0, 1).temLixeira()){
+            b=true;
+        }else if(linha==0 && coluna==dim-2 && 
+                ambiente.getQuadrante(1, dim-1).temLixeira()){
+            b=true;
+        }else if(linha==1 && coluna==dim-1 && 
+                ambiente.getQuadrante(1, 0).temLixeira()){
+            b=true;
+        }else if(linha==dim-2 && coluna==0 && 
+                ambiente.getQuadrante(dim-1, 1).temLixeira()){
+            b=true;
+        }else if(linha==dim-1 && coluna==1 && 
+                ambiente.getQuadrante(dim-2, 0).temLixeira()){
+            b=true;
+        }else if(linha==dim-2 && coluna==dim-1 && 
+                ambiente.getQuadrante(dim-1, dim-2).temLixeira()){
+            b=true;
+        }else if(linha==dim-1 && coluna==dim-2 && 
+                ambiente.getQuadrante(dim-2, dim-1).temLixeira()){
+            b=true;
+        }else b=false;
+        return b;
+    }
+    
     public boolean sujeiraEliminada(){
         if(ambiente.estaLimpo()){
             for(Lixeira lx: lixeiras){
