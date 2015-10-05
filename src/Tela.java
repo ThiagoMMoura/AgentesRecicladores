@@ -1,8 +1,6 @@
 
-import com.sun.javafx.css.Style;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.util.*;
 import javax.swing.*;
 import javax.swing.border.*;
 
@@ -12,9 +10,9 @@ import javax.swing.border.*;
  */
 public class Tela extends javax.swing.JFrame implements SaidaSimulador{
     private JLabel[][] quadrantes;
-    private ArrayList<JMenuItem> itens;
     private Simulador simulador;
     private boolean ambienteIniciado;
+    private boolean pausado;
     private int dimenssao;
     private int qtdLixos;
     private int qtdLixeiras;
@@ -28,6 +26,7 @@ public class Tela extends javax.swing.JFrame implements SaidaSimulador{
         this.setLocationRelativeTo(null);
         selPequenoActionPerformed(null);
         this.ambienteIniciado = false;
+        this.pausado = true;
     }
 
     /**
@@ -43,13 +42,16 @@ public class Tela extends javax.swing.JFrame implements SaidaSimulador{
         painelPai = new javax.swing.JPanel();
         painelBarra = new javax.swing.JPanel();
         barra = new javax.swing.JToolBar();
+        jSeparator3 = new javax.swing.JToolBar.Separator();
         selPequeno = new javax.swing.JToggleButton();
         selMedio = new javax.swing.JToggleButton();
         selGrande = new javax.swing.JToggleButton();
         jSeparator1 = new javax.swing.JToolBar.Separator();
-        selIniciar = new javax.swing.JToggleButton();
-        btnProximoCiclo = new javax.swing.JButton();
-        btnProximoAgente = new javax.swing.JButton();
+        btnIniciar = new javax.swing.JButton();
+        jSeparator2 = new javax.swing.JToolBar.Separator();
+        btnSimular = new javax.swing.JButton();
+        btnSimluarCiclo = new javax.swing.JButton();
+        btnSimularAgente = new javax.swing.JButton();
         painelFilhoAmbiente = new javax.swing.JPanel();
         scrollAmbiente = new javax.swing.JScrollPane();
         painelScrollAmbiente = new javax.swing.JPanel();
@@ -65,6 +67,7 @@ public class Tela extends javax.swing.JFrame implements SaidaSimulador{
 
         barra.setFloatable(false);
         barra.setRollover(true);
+        barra.add(jSeparator3);
 
         gupoTamanho.add(selPequeno);
         selPequeno.setSelected(true);
@@ -81,6 +84,7 @@ public class Tela extends javax.swing.JFrame implements SaidaSimulador{
 
         gupoTamanho.add(selMedio);
         selMedio.setText("Médio");
+        selMedio.setAlignmentX(0.5F);
         selMedio.setFocusable(false);
         selMedio.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         selMedio.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -104,44 +108,57 @@ public class Tela extends javax.swing.JFrame implements SaidaSimulador{
         barra.add(selGrande);
         barra.add(jSeparator1);
 
-        selIniciar.setText("Iniciar");
-        selIniciar.setFocusable(false);
-        selIniciar.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        selIniciar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        selIniciar.addActionListener(new java.awt.event.ActionListener() {
+        btnIniciar.setText("Iniciar");
+        btnIniciar.setFocusable(false);
+        btnIniciar.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnIniciar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnIniciar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                selIniciarActionPerformed(evt);
+                btnIniciarActionPerformed(evt);
             }
         });
-        barra.add(selIniciar);
+        barra.add(btnIniciar);
+        barra.add(jSeparator2);
 
-        btnProximoCiclo.setText("Próximo Ciclo");
-        btnProximoCiclo.setFocusable(false);
-        btnProximoCiclo.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        btnProximoCiclo.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        btnProximoCiclo.addActionListener(new java.awt.event.ActionListener() {
+        btnSimular.setText("Simular");
+        btnSimular.setFocusable(false);
+        btnSimular.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnSimular.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnSimular.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnProximoCicloActionPerformed(evt);
+                btnSimularActionPerformed(evt);
             }
         });
-        barra.add(btnProximoCiclo);
+        barra.add(btnSimular);
 
-        btnProximoAgente.setText("Próximo Agente");
-        btnProximoAgente.setFocusable(false);
-        btnProximoAgente.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        btnProximoAgente.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        btnProximoAgente.addActionListener(new java.awt.event.ActionListener() {
+        btnSimluarCiclo.setText("Simular um Ciclo");
+        btnSimluarCiclo.setFocusable(false);
+        btnSimluarCiclo.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnSimluarCiclo.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnSimluarCiclo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnProximoAgenteActionPerformed(evt);
+                btnSimluarCicloActionPerformed(evt);
             }
         });
-        barra.add(btnProximoAgente);
+        barra.add(btnSimluarCiclo);
+
+        btnSimularAgente.setText("Simular um Agente");
+        btnSimularAgente.setAlignmentX(0.5F);
+        btnSimularAgente.setFocusable(false);
+        btnSimularAgente.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnSimularAgente.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnSimularAgente.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSimularAgenteActionPerformed(evt);
+            }
+        });
+        barra.add(btnSimularAgente);
 
         javax.swing.GroupLayout painelBarraLayout = new javax.swing.GroupLayout(painelBarra);
         painelBarra.setLayout(painelBarraLayout);
         painelBarraLayout.setHorizontalGroup(
             painelBarraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(barra, javax.swing.GroupLayout.DEFAULT_SIZE, 816, Short.MAX_VALUE)
+            .addComponent(barra, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         painelBarraLayout.setVerticalGroup(
             painelBarraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -170,7 +187,7 @@ public class Tela extends javax.swing.JFrame implements SaidaSimulador{
         painelFilhoAmbiente.setLayout(painelFilhoAmbienteLayout);
         painelFilhoAmbienteLayout.setHorizontalGroup(
             painelFilhoAmbienteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(scrollAmbiente, javax.swing.GroupLayout.DEFAULT_SIZE, 561, Short.MAX_VALUE)
+            .addComponent(scrollAmbiente, javax.swing.GroupLayout.DEFAULT_SIZE, 551, Short.MAX_VALUE)
         );
         painelFilhoAmbienteLayout.setVerticalGroup(
             painelFilhoAmbienteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -181,10 +198,9 @@ public class Tela extends javax.swing.JFrame implements SaidaSimulador{
         painelFilhoAmbiente.getAccessibleContext().setAccessibleName("Tabuleiro");
         painelFilhoAmbiente.getAccessibleContext().setAccessibleDescription("");
 
-        painelInformacoes.setPreferredSize(new java.awt.Dimension(250, 429));
+        painelInformacoes.setPreferredSize(new java.awt.Dimension(260, 429));
 
         campoInformacoes.setEditable(false);
-        campoInformacoes.setBackground(new java.awt.Color(255, 255, 204));
         campoInformacoes.setContentType("text/html"); // NOI18N
         campoInformacoes.setText("<html>\r\n  <head>\r\n\r\n  </head>\r\n  <body>\r\n    <p style=\"margin-top: 0\">\r\n\n    </p>\r\n  </body>\r\n</html>\r\n");
         campoInformacoes.setToolTipText("");
@@ -194,7 +210,7 @@ public class Tela extends javax.swing.JFrame implements SaidaSimulador{
         painelInformacoes.setLayout(painelInformacoesLayout);
         painelInformacoesLayout.setHorizontalGroup(
             painelInformacoesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 250, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 260, Short.MAX_VALUE)
         );
         painelInformacoesLayout.setVerticalGroup(
             painelInformacoesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -211,7 +227,7 @@ public class Tela extends javax.swing.JFrame implements SaidaSimulador{
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(painelPai, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 558, Short.MAX_VALUE)
+            .addComponent(painelPai, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();
@@ -241,29 +257,41 @@ public class Tela extends javax.swing.JFrame implements SaidaSimulador{
         criarAmbiente();
     }//GEN-LAST:event_selGrandeActionPerformed
 
-    private void selIniciarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selIniciarActionPerformed
-        if(selIniciar.isSelected()){
-            btnProximoAgente.setEnabled(true);
-            btnProximoCiclo.setEnabled(true);
+    private void btnSimluarCicloActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSimluarCicloActionPerformed
+        simulador.iniciarCiclo();
+    }//GEN-LAST:event_btnSimluarCicloActionPerformed
+
+    private void btnSimularAgenteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSimularAgenteActionPerformed
+        simulador.iniciarProximoAgente();
+    }//GEN-LAST:event_btnSimularAgenteActionPerformed
+
+    private void btnIniciarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIniciarActionPerformed
+        if(!ambienteIniciado){
+            pausado = false;
+            iniciarAmbiente();
+        }
+        else if (ambienteIniciado&&!pausado){
+            pausado = true;
+            inicializaBotoes();
+            btnIniciar.setText("Continuar");
+        }else pausado = false;
+
+        if(!pausado){
+            btnIniciar.setText("Pausar");
+            btnSimular.setEnabled(true);
+            btnSimularAgente.setEnabled(true);
+            btnSimluarCiclo.setEnabled(true);
             selPequeno.setEnabled(false);
             selMedio.setEnabled(false);
             selGrande.setEnabled(false);
-            if(!ambienteIniciado){
-                iniciarAmbiente();
-                ambienteIniciado = true;
-            }
-        }else{
-            inicializaBotoes();
         }
-    }//GEN-LAST:event_selIniciarActionPerformed
+    }//GEN-LAST:event_btnIniciarActionPerformed
 
-    private void btnProximoCicloActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnProximoCicloActionPerformed
-        simulador.iniciarCiclo();
-    }//GEN-LAST:event_btnProximoCicloActionPerformed
-
-    private void btnProximoAgenteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnProximoAgenteActionPerformed
-        simulador.iniciarProximoAgente();
-    }//GEN-LAST:event_btnProximoAgenteActionPerformed
+    private void btnSimularActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSimularActionPerformed
+        while(!simulador.sujeiraEliminada()){
+            simulador.iniciarCiclo();
+        }
+    }//GEN-LAST:event_btnSimularActionPerformed
 
     /**
      * @param args the command line arguments
@@ -302,12 +330,16 @@ public class Tela extends javax.swing.JFrame implements SaidaSimulador{
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToolBar barra;
-    private javax.swing.JButton btnProximoAgente;
-    private javax.swing.JButton btnProximoCiclo;
+    private javax.swing.JButton btnIniciar;
+    private javax.swing.JButton btnSimluarCiclo;
+    private javax.swing.JButton btnSimular;
+    private javax.swing.JButton btnSimularAgente;
     private javax.swing.JTextPane campoInformacoes;
     private javax.swing.ButtonGroup gupoTamanho;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JToolBar.Separator jSeparator1;
+    private javax.swing.JToolBar.Separator jSeparator2;
+    private javax.swing.JToolBar.Separator jSeparator3;
     private javax.swing.JPanel painelAmbiente;
     private javax.swing.JPanel painelBarra;
     private javax.swing.JPanel painelFilhoAmbiente;
@@ -316,23 +348,28 @@ public class Tela extends javax.swing.JFrame implements SaidaSimulador{
     private javax.swing.JPanel painelScrollAmbiente;
     private javax.swing.JScrollPane scrollAmbiente;
     private javax.swing.JToggleButton selGrande;
-    private javax.swing.JToggleButton selIniciar;
     private javax.swing.JToggleButton selMedio;
     private javax.swing.JToggleButton selPequeno;
     // End of variables declaration//GEN-END:variables
 
     private void inicializaBotoes(){
-        btnProximoAgente.setEnabled(false);
-        btnProximoCiclo.setEnabled(false);
+        btnIniciar.setText("Iniciar");
+        btnSimular.setEnabled(false);
+        btnSimularAgente.setEnabled(false);
+        btnSimluarCiclo.setEnabled(false);
         selPequeno.setEnabled(true);
         selMedio.setEnabled(true);
         selGrande.setEnabled(true);
     }
     private void iniciarAmbiente(){
-        simulador.iniciarAmbiente();
+        ambienteIniciado = simulador.iniciarAmbiente();
     }
     
     private void criarAmbiente(){
+        ambienteIniciado = false;
+        pausado = false;
+        btnIniciar.setText("Iniciar");
+        
         Dimension d = new Dimension(dimenssao*40, dimenssao*40);
         painelAmbiente.removeAll();
         
@@ -378,6 +415,17 @@ public class Tela extends javax.swing.JFrame implements SaidaSimulador{
         }
         
         String style="<style type=\"text/css\">" +
+                "body{" +
+                    "font-family: Verdana;" +
+                    "font-style:normal;" +
+                    "font-size: 9px;" +
+                "}" +
+                "#maior{" +
+                    "font-size:11px;" +
+                "}" +
+                "th{" +
+                    "font-size:12px;" +
+                "}" +
                 "  table{" +
                 "     border-bottom: 1px #CCCCCC solid;" +
                 "     border-right: 1px #CCCCCC solid;" +
@@ -386,49 +434,48 @@ public class Tela extends javax.swing.JFrame implements SaidaSimulador{
                 "  th, td{" +
                 "	  border-left:1px #CCCCCC solid;" +
                 "	  border-top:1px #CCCCCC solid;" +
-                "  }" +
-                "  td {" +
                 "	text-align: center;" +
-                "}" +
+                "  }" +
                 "</style>";
         String informacoes="<html>" +
                 "<head>"+style+"</head><body>";
-        informacoes+="<h3 style=\"text-align:center;\">Agentes</h3>"
+        informacoes+="<h2 style=\"text-align:center;\">Agentes</h2>"
                 + "<div>";
         for(Agente ag:simulador.getAgentes()){
-            informacoes+="<table border=\"0\" cellpadding=\"2\" align=\"center\" cellspacing=\"0\">" +
+            informacoes+="<table border=\"0\" cellpadding=\"4\" align=\"center\" cellspacing=\"0\">" +
                     "<tr>" +
-                    "<th rowspan=\"2\" scope=\"col\">"+ag.getNome()+"</th>" +
-                    "<th colspan=\"2\" scope=\"col\"><h4>Saco Lixo Seco</h4></th>" +
-                    "<th colspan=\"2\" scope=\"col\"><h4>Saco Lixo Orgânico</h4></th>" +
+                    "<th rowspan=\"2\">"+ag.getNome()+"</th>" +
+                    "<td colspan=\"2\">Saco Lixo Seco</td>" +
+                    "<td colspan=\"2\">Saco Lixo Orgânico</td>" +
                     "</tr>"+
                     "<tr>" +
-                    "<td>"+ag.getQtdLixoSeco()+"</td>" +
-                    "<td>"+ag.getMaxLixo()+"</td>" +
-                    "<td>"+ag.getQtdLixoOrganico()+"</td>" +
-                    "<td>"+ag.getMaxLixo()+"</td>" +
+                    "<td id=\"maior\">"+ag.getQtdLixoSeco()+"</td>" +
+                    "<td id=\"maior\">"+ag.getMaxLixo()+"</td>" +
+                    "<td id=\"maior\">"+ag.getQtdLixoOrganico()+"</td>" +
+                    "<td id=\"maior\">"+ag.getMaxLixo()+"</td>" +
                     "</tr>"+
                     "</table>";
         }
         informacoes+="</div>";
-        informacoes+="<h3 style=\"text-align:center;\">Lixeiras</h3>"
+        informacoes+="<h2 style=\"text-align:center;\">Lixeiras</h2>"
                 + "<div>";
         for(Lixeira lx:simulador.getLixeiras()){
-            informacoes+="<table border=\"0\" cellpadding=\"2\" align=\"center\" cellspacing=\"0\">" +
+            informacoes+="<table border=\"0\" cellpadding=\"4\" align=\"center\" cellspacing=\"0\">" +
                     "<tr>" +
-                    "<th rowspan=\"2\" scope=\"col\">"+lx.getNome()+"</th>" +
-                    "<th scope=\"col\"><h4>Ocupado</h4></th>" +
-                    "<th scope=\"col\"><h4>Capacidade</h4></th>" +
+                    "<th rowspan=\"2\">"+lx.getNome()+"</th>" +
+                    "<td>Ocupado</td>" +
+                    "<td>Capacidade</td>" +
                     "</tr>"+
                     "<tr>" +
-                    "<td>"+lx.getQtdLixos()+"</td>" +
-                    "<td>"+lx.getCapacidade()+"</td>" +
+                    "<td id=\"maior\">"+lx.getQtdLixos()+"</td>" +
+                    "<td id=\"maior\">"+lx.getCapacidade()+"</td>" +
                     "</tr>"+
                     "</table>";
         }
         informacoes+="</div>";
         informacoes+="</body></html>";
         campoInformacoes.setText(informacoes);
+        paintComponents(this.getGraphics());
     }
 
 }

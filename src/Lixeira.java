@@ -30,7 +30,7 @@ public class Lixeira extends Peca{
     
     public boolean addLixo(Lixo lx){
         if(lixos.size()<capacidade){
-            System.out.println("Recebido lixo: "+lx.getNome());
+            System.out.println("Despejou lixo: "+lx.getNome());
             return lixos.add(lx);
         }
         return false;

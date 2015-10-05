@@ -1,6 +1,5 @@
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 /**
  * A classe Ambiente define o ambiente e a posição dos quadrantes.
@@ -48,6 +47,7 @@ public class Ambiente {
             throw new QuadranteNotExistException();
         }else return quadrantes[linha][coluna].estaVazio();
     }
+    
     public int getDimenssao() {
         return dimenssao;
     }

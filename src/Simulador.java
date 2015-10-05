@@ -1,6 +1,8 @@
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**
@@ -44,12 +46,13 @@ public class Simulador {
         return agentes;
     }
     
-    public void iniciarAmbiente(){
+    public boolean iniciarAmbiente(){
         posicionarLixos(qtdLixos);
         posicionarLixeiras(qtdLixeiras, qtdLixos/qtdLixeiras);
         posicionarAgentes(qtdAgentes, getDimenssao()/2);
         
         out.atualizaCiclo(this.ambiente);
+        return true;
     }
     
     public void iniciarCiclo(){
@@ -57,7 +60,12 @@ public class Simulador {
             agentes.get(proximoAgente).jogar();
             out.atualizaCiclo(this.ambiente);
             proximoAgente++;
-        }
+                try {
+                    Thread.sleep(400);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(Tela.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
         proximoAgente = 0;
     }
     
@@ -129,19 +137,18 @@ public class Simulador {
                         cs = ambiente.getQuadrante(linha, coluna);
                     }while(!cs.estaVazio());
                     //Bloco de IFs para impedir que as lixeiras se bloqueiem (Tentar reduzir código)
-                    if(ambiente.esquerda(linha, coluna)!=null&&
-                            (ambiente.esquerda(linha, coluna).getPeca()instanceof Lixeira)){
+                    if(ambiente.esquerda(linha, coluna)==null||
+                            ambiente.direita(linha, coluna)==null||
+                            ambiente.baixo(linha, coluna)==null||
+                            ambiente.cima(linha, coluna)==null){
                         b=true;
-                    }else if(ambiente.direita(linha, coluna)!=null&&
-                            (ambiente.direita(linha, coluna).getPeca()instanceof Lixeira)){
+                    }else if(ambiente.esquerda(linha, coluna).getPeca()instanceof Lixeira){
                         b=true;
-                    }else if(ambiente.baixo(linha, coluna)!=null&&
-                            (ambiente.baixo(linha, coluna).getPeca()instanceof Lixeira)){
+                    }else if(ambiente.direita(linha, coluna).getPeca()instanceof Lixeira){
                         b=true;
-                    }else if(ambiente.cima(linha, coluna)!=null&&
-                            (ambiente.cima(linha, coluna).getPeca()instanceof Lixeira)){
+                    }else if(ambiente.baixo(linha, coluna).getPeca()instanceof Lixeira){
                         b=true;
-                    }else b=false;
+                    }else b = ambiente.cima(linha, coluna).getPeca()instanceof Lixeira;
                 }while(b);
             }while(ambiente.posicaoObstruida(linha, coluna));
             LixeiraOrganico lo = new LixeiraOrganico("Lo"+(i+1), capacidade);

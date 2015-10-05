@@ -37,6 +37,13 @@ public class Quadrante {
         return null;
     }
     
+    public Lixeira getLixeira(){
+        if(!estaVazio()&&this.peca instanceof Lixeira){
+            return (Lixeira) this.peca;
+        }
+        return null;
+    }
+    
     public Lixo recolherLixo(){
         if(getLixo()!=null) return (Lixo) remover();
         return null;

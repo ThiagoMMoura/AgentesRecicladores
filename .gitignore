@@ -45,3 +45,4 @@ Temporary Items
 *.mf
 *.properties
 Build
+/dist/
